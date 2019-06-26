@@ -13,6 +13,11 @@ const mod = {
 				e.reply("Nice try!");
 				return;
 			}
+			for(var i in coms){
+				if(coms[i].command.toLowerCase() == input.split("=>")[0].toLowerCase()){
+					coms.splice(i,1);
+				}
+			}
 			coms.push({command: input.split("=>")[0], output: input.split("=>")[1]});
 			e.reply("Command " + input.split("=>")[0] + " added with output: " + input.split("=>")[1]);
 			fs.writeFileSync('./plugins/data/uselesscom.json', JSON.stringify(coms), 'utf8');
@@ -25,8 +30,8 @@ const mod = {
 			if(coms[i].command.toLowerCase() == args[0].toLowerCase()){
 				let omsg = coms[i].output.toString();
 				omsg = omsg.replace(/\%n/g, e.from.nick);
-				omsg = omsg.replace(/\%1/g, args[1]);
-				omsg = omsg.replace(/\%2/g, args[2]);
+				omsg = omsg.replace(/(\%1|\$1)/g, args[1]);
+				omsg = omsg.replace(/(\%2|\$2)/g, args[2]);
 				omsg = omsg.replace(/\%3/g, args[3]);
 				omsg = omsg.replace(/\%4/g, args[4]);
 				e.reply(omsg);
