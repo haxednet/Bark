@@ -9,11 +9,11 @@ const mod = {
 			let input = e.message.substr(12);
 			if(input.substr(0,1) != ".") return;
 			if(input.indexOf("=>") < 1) return;
-			if(input.indexOf("\_") > 1 || input.indexOf("=>.") > 1){
+			if(input.indexOf("\_") > 1 || input.indexOf("。") > 1 || input.indexOf("=>.") > 1){
 				e.reply("Nice try!");
 				return;
 			}
-			for(var i in coms){
+			for(let i in coms){
 				if(coms[i].command.toLowerCase() == input.split("=>")[0].toLowerCase()){
 					coms.splice(i,1);
 				}
