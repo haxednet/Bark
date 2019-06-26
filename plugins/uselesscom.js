@@ -32,8 +32,6 @@ const mod = {
 				omsg = omsg.replace(/\%n/g, e.from.nick);
 				omsg = omsg.replace(/(\%1|\$1)/g, args[1]);
 				omsg = omsg.replace(/(\%2|\$2)/g, args[2]);
-				omsg = omsg.replace(/\%3/g, args[3]);
-				omsg = omsg.replace(/\%4/g, args[4]);
 				e.reply(omsg);
 				return;
 			}
