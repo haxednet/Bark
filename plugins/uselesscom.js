@@ -18,7 +18,12 @@ const mod = {
 					coms.splice(i,1);
 				}
 			}
-			coms.push({command: input.split("=>")[0], output: input.split("=>")[1]});
+			let cs = input.split("=>");
+			if(cs[1].substr(0,4) == "/me "){
+				coms.push({command: cs[0], output: cs[1].replace("/me ", "ACTION ") + ""});
+			}else{
+				coms.push({command: input.split("=>")[0], output: input.split("=>")[1]});
+			}
 			e.reply("Command " + input.split("=>")[0] + " added with output: " + input.split("=>")[1]);
 			fs.writeFileSync('./plugins/data/uselesscom.json', JSON.stringify(coms), 'utf8');
 		}}
@@ -29,9 +34,10 @@ const mod = {
 		for(let i in coms){
 			if(coms[i].command.toLowerCase() == args[0].toLowerCase()){
 				let omsg = coms[i].output.toString();
-				omsg = omsg.replace(/\%n/g, e.from.nick);
-				omsg = omsg.replace(/(\%1|\$1)/g, args[1]);
-				omsg = omsg.replace(/(\%2|\$2)/g, args[2]);
+				for (let g = 0; g < 10; g++) { 
+					const re = new RegExp("\\$" + g, "g");
+					omsg = omsg.replace(re, args[g]);
+				}
 				e.reply(omsg);
 				return;
 			}
