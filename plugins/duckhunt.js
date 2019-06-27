@@ -45,6 +45,15 @@ const mod = {
 			befriend(e);
 		}},
 		
+		{command: "reloadstats", callback: (e)=>{
+			if(e.admin){
+				stats = JSON.parse(fs.readFileSync('./plugins/data/duckhunt.stats.json', 'utf8'));
+				e.reply("Reloaded duck stats");
+			}else{
+				e.reply("You're not an admin! not listening to you. 🙉");
+			}
+		}},
+		
 		{command: "befriend", callback: (e)=>{
 			befriend(e);
 		}},
@@ -88,7 +97,12 @@ const mod = {
 		}},
 		
 		{command: "ducks", callback: (e)=>{
-			e.reply(e.from.nick + " has killed " + getStats(e.from.nick).kills + " and saved " + getStats(e.from.nick).friends);
+			let theUser = e.message.substr(7).replace(" ", "");
+			if(theUser == ""){
+				e.reply(e.from.nick + " has killed " + getStats(e.from.nick).kills + " and saved " + getStats(e.from.nick).friends);
+			}else{
+				e.reply(theUser + " has killed " + getStats(theUser).kills + " and saved " + getStats(theUser).friends);
+			}
 		}},
 		
 		{command: "friends", callback: (e)=>{

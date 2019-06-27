@@ -34,6 +34,7 @@ const mod = {
 		for(let i in coms){
 			if(coms[i].command.toLowerCase() == args[0].toLowerCase()){
 				let omsg = coms[i].output.toString();
+				omsg = omsg.replace(/\%n/g, e.from.nick);
 				for (let g = 0; g < 10; g++) { 
 					const re = new RegExp("\\$" + g, "g");
 					omsg = omsg.replace(re, args[g]);
