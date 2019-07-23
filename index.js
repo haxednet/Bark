@@ -32,19 +32,29 @@ function newBot(){
 		host: "irc.freenode.org",
 		port: 6667,
 		nick: "Bark",
-		ident: "guest",
-		realNme: "a bot"
+		ident: "Grr",
+		realNme: "Woof"
 	});
 
 	bot.on('data', (e) => {
 		console.log(e);
-		if(e.indexOf("\r\nNickServ") > -1 && e.indexOf("identified") > -1){
+		if(e.indexOf("NickServ") > -1 && e.indexOf("identified") > -1){
 			/* ugly hack need to fix this */
 			bot.sendData("JOIN ##defocus");
 		}
 		
 		if(e.toLowerCase().indexOf("amIalive") > -1){
 			lastTime = Date.now();
+		}
+		
+		for(let i in mods){
+			if(mods[i].mod.onData != undefined) mods[i].mod.onData(e);
+		}
+	});
+	
+	bot.on('numeric', (e) => {
+		for(let i in mods){
+			if(mods[i].mod.onNumeric != undefined) mods[i].mod.onNumeric(e);
 		}
 	});
 
@@ -129,7 +139,7 @@ function newBot(){
 	});
 
 	bot.on('connected', () => {
-		bot.sendData("nickserv identify bark <SECRET>");
+		bot.sendData("nickserv identify bark <secret>");
 	});
 	
 	cBot = bot;

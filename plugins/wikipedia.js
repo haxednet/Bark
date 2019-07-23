@@ -3,7 +3,7 @@
 const mod = {
 	hook_commands: [
 		{command: "wikipedia", callback: (e)=>{
-			let input = e.message.substr(6);
+			let input = e.message.substr(11);
 			request('https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=' + input, (error, response, body)=>{
 				if(error){
 					e.reply("Error :(");

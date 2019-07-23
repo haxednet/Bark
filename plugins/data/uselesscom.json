@@ -1,3 +1,206 @@
-[
-	{"command": ".testcom", "output": "it works!"}
+[{
+		"command": ".testcom",
+		"output": "it works!",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".quack",
+		"output": "🦆",
+		"args": 0,
+		"user": "null"
+
+	},
+	{
+		"command": ".pencil",
+		"output": "((̲̅ ̲̅(̲̅C̲̅r̲̅a̲̅y̲̅o̲̅l̲̲̅̅a̲̅( ̲̅((>",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".dance",
+		"output": "Throws [̲̅$̲̅(̲̅1)̲̅$̲̅] at $1 .. oh baby!",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".dance",
+		"output": "Throws [̲̅$̲̅(̲̅1)̲̅$̲̅] at %1 .. oh baby!",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".lol",
+		"output": "bye",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".cray",
+		"output": "That shit ((̲̅ ̲̅(̲̅C̲̅r̲̅a̲̅y̲̅o̲̅l̲̲̅̅a̲̅( ̲̅((>",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".hoffman",
+		"output": "is great",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".dicks",
+		"output": "that's a lotta cocks!",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".mess(x)",
+		"output": "$x is a mess",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".mess",
+		"output": "$1 is a \u0002\u001fMESS",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".domein",
+		"output": "\".\"+duckforce",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".fart",
+		"output": "/me farts on $1",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".rustle",
+		"output": "/me rustles $1's jimmies",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".muffin",
+		"output": "/me throws $1 out of a 12th story window",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".jenni",
+		"output": "oh baby",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".chat",
+		"output": " bark bark bark bark bark bark. bark bark bark bark? bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark bark",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".pet",
+		"output": "/me licks %n",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".barf",
+		"output": "/me barfs on $1",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".fuckbribe",
+		"output": "will you marry me? ",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".kill",
+		"output": "The first law of robotics precludes this action. A robot may not injure a human being or, through inaction, allow a human being to come to harm.",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".shoot",
+		"output": "The first law of robotics precludes this action. A robot may not injure a human being or, through inaction, allow a human being to come to harm.",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".humancentipede",
+		"output": "The first law of robotics precludes this action. A robot may not injure a human being or, through inaction, allow a human being to come to harm.",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".pull",
+		"output": "The first law of robotics precludes this action. A robot may not injure a human being or, through inaction, allow a human being to come to harm.",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".poke",
+		"output": "/me pokes diogenese ",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".shoot Bark",
+		"output": "Computer says no.",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".kill Bark",
+		"output": "Computer says no.",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".suckbribe",
+		"output": "/me sucks handicraftsman ",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".bite",
+		"output": "/me bites frmus",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".q",
+		"output": "/quit",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".duckbribe",
+		"output": "Deprecated command. use .bribe",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": "._.",
+		"output": "O_O",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".test",
+		"output": "test.",
+		"args": 0,
+		"user": "null"
+	},
+	{
+		"command": ".£",
+		"output": "/me pounds $1, Doggy-Style!",
+		"args": 0,
+		"user": "null"
+	}
 ]

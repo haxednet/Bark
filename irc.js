@@ -77,6 +77,7 @@ class irc extends EventEmitter {
 		
 		
 		if(isNaN(bits[1]) == false){
+			this.emit("numeric", {number: parseInt(bits[1]), data: e});
 			switch(bits[1]){
 				case E.RPL_WELCOME:
 					this.emit("connected");
