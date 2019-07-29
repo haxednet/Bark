@@ -2,6 +2,7 @@ const tls = require('tls');
 const net = require('net');
 const EventEmitter = require('events');
 
+let lastReply = 0;
 let logging = true;
 
 class irc extends EventEmitter {
@@ -11,6 +12,7 @@ class irc extends EventEmitter {
 		if(!e.port) throw("No port given!");
 		if(!e.nick) throw("No nick given!");
 		e.ident = e.ident || "bot";
+		e.auth = e.auth || {type:"none"};
 		e.realName = e.realName || "simple-irc bot";
 		this.config = e;
 		this.makeSocket();
@@ -24,8 +26,10 @@ class irc extends EventEmitter {
 		const myself = this;
 		
 		this.client.connect(this.config.port, this.config.host, function() {
+			let caps = ["multi-prefix", "account-notify"];
+			if(myself.config.auth.type == "sasl_plain") caps.push("sasl");
 			myself.emit("connect");
-			myself.sendData("CAP REQ :multi-prefix account-notify");
+			myself.sendData("CAP REQ :" + caps.join(" "));
 			myself.sendData("NICK " + myself.config.nick);
 			myself.sendData("USER " + myself.config.ident + " * 0 :" + myself.config.realName);
 		});
@@ -71,6 +75,7 @@ class irc extends EventEmitter {
 		
 		const bits = e.split(" ");
 		const UB = e.toUpperCase().split(" ");
+		const myself = this;
 		
 		let cMsg = bits[bits.length - 1];
 		if(e.indexOf(" :") > -1) cMsg = e.substr(e.indexOf(" :") + 2);
@@ -85,6 +90,10 @@ class irc extends EventEmitter {
 						this.sendData("JOIN " + this.config.channels[i] );
 					}
 					break;
+				case E.RPL_SASL_AUTH:
+				case E.ERR_SASL_AUTH:
+					this.sendData("CAP END");
+					break;
 			}
 		}else{
 			switch(UB[1]){
@@ -95,23 +104,45 @@ class irc extends EventEmitter {
 					
 				case "CAP":
 					if(UB[3] == "ACK"){
-						this.sendData("CAP END");
+						let caps = cMsg.split(" ");
+						if(caps.includes("sasl")){
+							console.log("Attempting to authenticate with sasl plain...");
+							this.sendData("AUTHENTICATE PLAIN");
+						}else{
+							this.sendData("CAP END");
+						}
+						
+					}
+					break;
+				
+				case "AUTHENTICATE":
+					if(UB[2] == "+"){
+						console.log("sending sasl login");
+						this.sendData("AUTHENTICATE " + btoa(this.config.auth.user + String.fromCharCode(0) + this.config.auth.user + String.fromCharCode(0) + this.config.auth.password));
 					}
 					break;
 
 				case "NOTICE":
 					if(this.isChannel(bits[2])){
-						this.emit("notice", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: false, reply: (e)=>{this.sendData("NOTICE " + bits[2] + " :" + e)}});
+						this.emit("notice", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: false, reply: (e)=>{
+							sendReply(bits[2], "NOTICE", e, myself);
+						}});
 					}else{
-						this.emit("notice", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: true, reply: (e)=>{this.sendData("NOTICE " + parseUser(bits[0]).nick + " :" + e)}});
+						this.emit("notice", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: true, reply: (e)=>{
+							sendReply(bits[0], "NOTICE", e, myself);
+						}});
 					}
 					break;
 					
 				case "PRIVMSG":
 					if(this.isChannel(bits[2])){
-						this.emit("privmsg", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: false, reply: (e)=>{this.sendData("PRIVMSG " + bits[2] + " :" + e)}});
+						this.emit("privmsg", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: false, reply: (e)=>{
+							sendReply(bits[2], "PRIVMSG", e, myself);
+						}});
 					}else{
-						this.emit("privmsg", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: true, reply: (e)=>{this.sendData("PRIVMSG " + parseUser(bits[0]).nick + " :" + e)}});
+						this.emit("privmsg", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: true, reply: (e)=>{
+							sendReply(bits[0], "PRIVMSG", e, myself);
+						}});
 					}
 					break;
 					
@@ -128,6 +159,11 @@ class irc extends EventEmitter {
 					break;
 					
 			}
+		}
+		
+		function sendReply(channel, type, message, ms){
+			if(channel.substr(0,1)=="#") channel = parseUser(channel).nick;
+			ms.sendData(type + " " + channel + " :" + message);
 		}
 		
 		function parseUser(e){
@@ -185,7 +221,9 @@ function log(e){
 	if(logging) console.log(e);
 }
 
-
+function btoa(e){
+	return  Buffer.from(e).toString('base64');
+}
 
 const E = {
 	"RPL_WELCOME": "001",

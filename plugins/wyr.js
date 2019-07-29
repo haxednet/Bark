@@ -2,7 +2,7 @@ const http = require('http');
 
 const mod = {
 	hook_commands: [
-		{command: "wyr", callback: (e)=>{
+		{command: "wyr", usage: "Gets a random \"would you rather\" question. command accepts no arguments.", disabled: true, callback: (e)=>{
 			httpGet("http://api.haxed.net/wyr/", (a)=>{
 				if(a.length > 3){
 					let J = JSON.parse(a);

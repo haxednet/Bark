@@ -8,7 +8,7 @@ let lastSend = 0;
 
 const mod = {
 	hook_commands: [
-		{command: "bark", callback: (e)=>{
+		{command: "bark", hidden: true, callback: (e)=>{
 			if(Date.now()-lastSend<5000){
 				e.reply("No thanks!");
 			}else{

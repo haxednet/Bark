@@ -2,6 +2,8 @@ const tls = require('tls');
 const fs = require('fs');
 const irc = require('./irc.js');
 
+const password = fs.readFileSync('password.txt', 'utf8');
+
 let commandPrefix = ".";
 
 let admins = ["burdirc/developer/duckgoose"];
@@ -33,15 +35,13 @@ function newBot(){
 		port: 6667,
 		nick: "Bark",
 		ident: "Grr",
-		realNme: "Woof"
+		realNme: "Woof",
+		auth: {type: "sasl_plain", user: "bark", password: password},
+		channels: ["##defocus"]
 	});
 
 	bot.on('data', (e) => {
 		console.log(e);
-		if(e.indexOf("NickServ") > -1 && e.indexOf("identified") > -1){
-			/* ugly hack need to fix this */
-			bot.sendData("JOIN ##defocus");
-		}
 		
 		if(e.toLowerCase().indexOf("amIalive") > -1){
 			lastTime = Date.now();
@@ -79,6 +79,9 @@ function newBot(){
 						}
 						const mod = require("./plugins/" + e.args[1]);
 						mods.push({name: e.args[1], mod: mod});
+						for(let i in mods){
+							if(mods[i].mod.onBot != undefined) mods[i].mod.onBot(cBot);
+						}
 						e.reply("plugin " + e.args[1] + " reloaded");
 						return;
 					}else{
@@ -93,7 +96,9 @@ function newBot(){
 					let c = "";
 					for(let i in mods){
 						for(let a in mods[i].mod.hook_commands){
-							c = c + commandPrefix + mods[i].mod.hook_commands[a].command + ", ";
+							if(mods[i].mod.hook_commands[a].hidden == undefined || mods[i].mod.hook_commands[a].hidden == false){
+								c = c + commandPrefix + mods[i].mod.hook_commands[a].command + ", ";
+							}
 						}
 					}
 					return e.reply("Supported commands: " + c.slice(0,-2));
@@ -117,6 +122,53 @@ function newBot(){
 					return e.reply("operation completed");
 					break;
 					
+				case "disable":
+					if(e.admin == false) return e.reply("You're not admin");
+					if(e.args.length < 2) return e.reply("give me a command!");
+					for(let i in mods){
+						for(let a in mods[i].mod.hook_commands){
+							if(e.args[1] == commandPrefix + mods[i].mod.hook_commands[a].command){
+								mods[i].mod.hook_commands[a].disabled = true;
+								return e.reply("operation completed");
+							}
+						}
+					}
+					
+					return e.reply("I didn't find that command");
+					break;
+					
+				case "enable":
+					if(e.admin == false) return e.reply("You're not admin");
+					if(e.args.length < 2) return e.reply("give me a command!");
+					for(let i in mods){
+						for(let a in mods[i].mod.hook_commands){
+							if(e.args[1] == commandPrefix + mods[i].mod.hook_commands[a].command){
+								mods[i].mod.hook_commands[a].disabled = false;
+								return e.reply("operation completed");
+							}
+						}
+					}
+					
+					return e.reply("I didn't find that command");
+					break;
+					
+				case "usage":
+					if(e.args.length < 2) return e.reply("give me a command!");
+					for(let i in mods){
+						for(let a in mods[i].mod.hook_commands){
+							if(e.args[1] == commandPrefix + mods[i].mod.hook_commands[a].command){
+								if(mods[i].mod.hook_commands[a].usage != undefined){
+									return e.reply(mods[i].mod.hook_commands[a].usage.replace(/\$/g,commandPrefix));
+								}else{
+									return e.reply("There is no usage information for this command");
+								}
+							}
+						}
+					}
+					
+					return e.reply("I didn't find that command");
+					break;
+					
 			}
 		}
 		
@@ -127,7 +179,11 @@ function newBot(){
 				if(e.message.substr(0,1) == commandPrefix){
 					if(mods[i].mod.hook_commands[a].command == e.message.toLowerCase().split(" ")[0].substr(1)){
 						e.hcmd = true;
-						mods[i].mod.hook_commands[a].callback(e);
+						if(mods[i].mod.hook_commands[a].disabled == undefined || mods[i].mod.hook_commands[a].disabled == false){
+							mods[i].mod.hook_commands[a].callback(e);
+						}else{
+							return e.reply("This command has been disabled");
+						}
 					}
 				}
 			}
@@ -136,10 +192,6 @@ function newBot(){
 			}
 		}
 		
-	});
-
-	bot.on('connected', () => {
-		bot.sendData("nickserv identify bark <secret>");
 	});
 	
 	cBot = bot;
@@ -155,7 +207,7 @@ function newBot(){
 
 setTimeout(function(){
 	if((Date.now() - lastTime) > 120000){
-		newBot();
+		process.exit(1);
 	}else{
 		cBot.sendData("PING :amIalive");
 	}

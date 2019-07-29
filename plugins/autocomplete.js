@@ -2,7 +2,7 @@
 
 const mod = {
 	hook_commands: [
-		{command: "autocomplete", callback: (e)=>{
+		{command: "autocomplete", usage: "Returns the auto-complete results from google search. Usage: $autocomplete why are cats so", callback: (e)=>{
 			let input = e.message.substr(14);
 			request('http://api.haxed.net/autocomplete/?q=' + input + " ", (error, response, body)=>{
 				if(error){

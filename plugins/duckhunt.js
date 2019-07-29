@@ -34,7 +34,7 @@ let whoTimer = 0;
 
 const mod = {
 	hook_commands: [
-		{command: "ducktimer", callback: (e)=>{
+		{command: "ducktimer", hidden: true, callback: (e)=>{
 			if(e.admin){
 				setTimer(e.message.substr(11));
 				e.reply("New timer speed was set!");
@@ -43,9 +43,10 @@ const mod = {
 			}
 		}},
 		
-		{command: "birdforce", callback: (e)=>{
+		{command: "birdforce", hidden: true, callback: (e)=>{
 			if(e.admin){
 				duck = true;
+				if(e.message.indexOf("crow") > 0) crow = true;
 				lastSend = Date.now();
 				ircBot.sendPrivmsg(chan, duckMsg());
 				
@@ -54,11 +55,11 @@ const mod = {
 			}
 		}},
 	
-		{command: "bef", callback: (e)=>{
+		{command: "bef", usage: "Makes you many wonderful bird friends", callback: (e)=>{
 			befriend(e);
 		}},
 		
-		{command: "reloadstats", callback: (e)=>{
+		{command: "reloadstats", hidden: true, callback: (e)=>{
 			if(e.admin){
 				stats = JSON.parse(fs.readFileSync('./plugins/data/duckhunt.stats.json', 'utf8'));
 				e.reply("Reloaded duck stats");
@@ -67,11 +68,11 @@ const mod = {
 			}
 		}},
 		
-		{command: "befriend", callback: (e)=>{
+		{command: "befriend", hidden: true, callback: (e)=>{
 			befriend(e);
 		}},
 		
-		{command: "bribe", callback: (e)=>{
+		{command: "bribe", usage: "Bribes a bird into come out of hiding... if you're lucky", callback: (e)=>{
 			if(Date.now() - lastBribe > 600000){
 				if(rand(2,4) == 3){
 					duck = true;
@@ -101,7 +102,7 @@ const mod = {
 			}
 		}},
 		
-		{command: "bang", callback: (e)=>{
+		{command: "bang", usage: "An awful command commits bird murder", callback: (e)=>{
 			bang(e);
 		}},
 		
@@ -110,25 +111,26 @@ const mod = {
 			activeHunt = true;
 		}},
 		
-		{command: "birds", callback: (e)=>{
+		{command: "birds", usage: "Gte the hunting stats for a given user. Usage: $birds duckgoose", callback: (e)=>{
 			let theUser = e.message.substr(7).replace(" ", "");
 			if(theUser == ""){
 				e.from.nick = linked(e.from.nick);
 				e.reply(e.from.nick + " has killed " + getStats(e.from.nick).kills + " and saved " + getStats(e.from.nick).friends);
 			}else{
+				theUser = linked(theUser);
 				e.reply(theUser + " has killed " + getStats(theUser).kills + " and saved " + getStats(theUser).friends);
 			}
 		}},
 		
-		{command: "friends", callback: (e)=>{
+		{command: "friends", hidden: true, callback: (e)=>{
 			e.reply("Bird friend scores: " + genFriends().substr(0,370) + "...");
 		}},
 		
-		{command: "killers", callback: (e)=>{
+		{command: "killers", hidden: true, callback: (e)=>{
 			e.reply("Bird killer scores: " + genKillers().substr(0,370) + "...");
 		}},
 		
-		{command: "stophunt", callback: (e)=>{
+		{command: "stophunt", hidden: true, callback: (e)=>{
 			e.reply("(" + e.from.nick +") The hunt has been stopped");
 			activeHunt = false;
 		}}
@@ -353,6 +355,7 @@ function nullout(e){
 }
 
 function linked(e){
+	e = e.replace(" ", "");
 	for(var i in links){
 		if(links[i][0].toLowerCase() == e.toLowerCase()) return links[i][1];
 	}

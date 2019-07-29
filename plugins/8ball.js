@@ -21,7 +21,7 @@
 
 const mod = {
 	hook_commands: [
-		{command: "8ball", callback: (e)=>{
+		{command: "8ball", usage: "A magic 8ball that has no real value at all. Usage: $8ball is duckgoose cool?", callback: (e)=>{
 			if(e.args.length > 1){
 				let re = replies[rand(0,replies.length-1)];
 				e.reply(e.from.nick + ": " + re);

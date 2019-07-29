@@ -2,7 +2,7 @@
 
 const mod = {
 	hook_commands: [
-		{command: "urban", callback: (e)=>{
+		{command: "urban", usage: "Searches urban dictionary. Type $urban term", hidden: true, callback: (e)=>{
 			let input = e.message.substr(7);
 			httpGet("http://api.urbandictionary.com/v0/define?term=" + input, (a)=>{
 				if(a.length > 3){
