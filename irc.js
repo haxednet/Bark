@@ -1,5 +1,6 @@
 const tls = require('tls');
 const net = require('net');
+const fs = require('fs');
 const EventEmitter = require('events');
 
 let lastReply = 0;
@@ -14,6 +15,7 @@ class irc extends EventEmitter {
 		e.ident = e.ident || "bot";
 		e.auth = e.auth || {type:"none"};
 		e.realName = e.realName || "simple-irc bot";
+		e.ssl = e.ssl || false;
 		this.config = e;
 		this.makeSocket();
 		this.dataCache = "";
@@ -25,14 +27,34 @@ class irc extends EventEmitter {
 		
 		const myself = this;
 		
-		this.client.connect(this.config.port, this.config.host, function() {
+		/*
+			if this.config.ssl is true then we need to make a TLS socket, otherwise we
+			a simple TCP socket.
+		*/
+		
+		if(this.config.ssl){
+			const options = {
+				key: fs.readFileSync('private-key.pem'),
+				cert: fs.readFileSync('public-cert.pem'),
+				rejectUnauthorized: false
+			};
+			this.client = tls.connect(this.config.port, this.config.host, options, () => {
+				connectionEst();
+			});
+		}else{
+			this.client.connect(this.config.port, this.config.host, function() {
+				connectionEst();
+			});
+		}
+		
+		function connectionEst(){
 			let caps = ["multi-prefix", "account-notify"];
 			if(myself.config.auth.type == "sasl_plain") caps.push("sasl");
 			myself.emit("connect");
 			myself.sendData("CAP REQ :" + caps.join(" "));
 			myself.sendData("NICK " + myself.config.nick);
 			myself.sendData("USER " + myself.config.ident + " * 0 :" + myself.config.realName);
-		});
+		}
 		
 		this.client.on('error', function(data) {
 			

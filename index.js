@@ -32,7 +32,8 @@ newBot();
 function newBot(){
 	const bot = new irc({
 		host: "irc.freenode.org",
-		port: 6667,
+		port: 6697,
+		ssl: true,
 		nick: "Bark",
 		ident: "Grr",
 		realNme: "Woof",
