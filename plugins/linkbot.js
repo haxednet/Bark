@@ -35,37 +35,48 @@ const mod = {
 			
 			let ud = e.message.match(urlR)[0];
 			console.log(ud);
-			request.get({
-					url: 'https://page.rest/fetch?token=YOUR_TOKEN&url=' + ud,
-					headers: { 
-					  'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36',
-					  'referer': 'https://page.rest/'
-					}
-				},
-
-			function (x, r, body) {
+			ud = ud.replace("m.slashdot.org","slashdot.org");
+			request('https://api.haxed.net/url/?url=' + ud, (err, res, body) => {
+				if (err) { return console.log(err); }
 				try{
 					let d = JSON.parse(body);
-					if(d.title != undefined){
-						d.title = d.title.replace(/\r|\n/ig, "");
-						e.reply("" + d.title + " - (" + ud + ")");
+					if(d["c-type"] == "text/html"){
+						if(d.title != undefined){
+							e.reply("Title: " + d.title + "");
+						}
+					}else{
+						if(d["c-type"]!= undefined){
+							e.reply("Content-type: " + d["c-type"] + ",  Size: " + humanFileSize(parseInt(d["content-length"]), true) + "");
+						}
 					}
 				}catch(a){
-					console.log("Error with page.rest API");
+					console.log("Error with the API");
+					//e.reply("Error with the API");
 				}
 			});
 		}
 		
-		
-		
-		
 
 		function youtube_parser(url){
-			const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+			const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
 			const match = url.match(regExp);
-			return (match&&match[7].length==11)? match[7] : false;
+			return (match&&match[1].length==11)? match[1] : false;
 		}
-		
+		function humanFileSize(bytes, si) {
+			var thresh = si ? 1000 : 1024;
+			if(Math.abs(bytes) < thresh) {
+				return bytes + ' B';
+			}
+			var units = si
+				? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+				: ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+			var u = -1;
+			do {
+				bytes /= thresh;
+				++u;
+			} while(Math.abs(bytes) >= thresh && u < units.length - 1);
+			return bytes.toFixed(1)+' '+units[u];
+		}
 	}
 }
 function rand(min, max) {

@@ -10,6 +10,8 @@ let lastSend = 0;
 
 let lastActive = 0;
 
+let bribers = [];
+
 let lastBribe = 0;
 
 let timer = 0;
@@ -25,14 +27,13 @@ let bans = [];
 let chan = "##defocus";
 
 var links = [
-	["Molly722", "Molly72"],
-	["patoganso","duckgoose"],
-	["upcrime","Hoffman"]
-];
+	["Molly722", "Molly72"]
+]
 
 let whoTimer = 0;
 
 const mod = {
+	bypassThrottle: true,
 	hook_commands: [
 		{command: "ducktimer", hidden: true, callback: (e)=>{
 			if(e.admin){
@@ -57,6 +58,7 @@ const mod = {
 	
 		{command: "bef", usage: "Makes you many wonderful bird friends", callback: (e)=>{
 			befriend(e);
+
 		}},
 		
 		{command: "reloadstats", hidden: true, callback: (e)=>{
@@ -72,38 +74,21 @@ const mod = {
 			befriend(e);
 		}},
 		
+		{command: "birdbantest", hidden: true, callback: (e)=>{
+			e.reply(e.from.nick +" Oh no! The dastardly duck bit you!");
+			setBan(e);
+		}},
+		{command: "duckbribe", hidden: true,usage: "Bribes a bird into come out of hiding... if you're lucky", callback: (e)=>{
+			bribe(e);
+		}},
 		{command: "bribe", usage: "Bribes a bird into come out of hiding... if you're lucky", callback: (e)=>{
-			if(Date.now() - lastBribe > 600000){
-				if(rand(2,4) == 3){
-					duck = true;
-					lastSend = Date.now();
-					ircBot.sendPrivmsg(chan, "・ ​ ゜゜・。。・゜゜\_0​< QUACK​!");
-				}else{
-					switch(rand(1,4)){
-						case 1:
-							ircBot.sendPrivmsg(chan, "the bird refused");
-							break;
-						case 2:
-							ircBot.sendPrivmsg(chan, "the bird took the bribe and ran");
-							break;
-						case 3:
-							ircBot.sendPrivmsg(chan, "the bird is suspicious");
-							break;
-						case 4:
-							ircBot.sendPrivmsg(chan, "the bird is too clever for that");
-							break;
-							
-					}
-				}
-				lastBribe = Date.now();
-			}else{
-				lastBribe = Date.now();
-				ircBot.sendPrivmsg(chan, "Bird was bribed recently. It knows better... (The more you try the longer it takes to forget)");
-			}
+			bribe(e);
 		}},
 		
 		{command: "bang", usage: "An awful command commits bird murder", callback: (e)=>{
-			bang(e);
+
+				bang(e);
+
 		}},
 		
 		{command: "starthunt", callback: (e)=>{
@@ -145,7 +130,9 @@ const mod = {
 			var unick = db[3];
 			var uname = db[4];
 			if(unick != uname){
-				links.push([unick, uname]);
+				if(unick != "0" && uname != "0"){
+					links.push([unick, uname]);
+				}
 			}
 		}
 	},
@@ -159,8 +146,92 @@ const mod = {
 					ircBot.sendData("WHO " + chan + " %na");
 				},5000);
 			}
+			if(ds[1] == "KICK"){
+				if(ds[3].toLowerCase() == "bark"){
+					setTimeout(function(){
+						ircBot.sendData("JOIN ##defocus");
+					},2000);
+					setTimeout(function(){
+						ircBot.sendData("PRIVMSG ##defocus :rude...");
+					},3000);					
+				}
+			}
+			if(ds[1] == "PART"){
+				if(ds[0].indexOf("unaffiliated/duckgoose/bot/bark") > -1){
+					setTimeout(function(){
+						ircBot.sendData("JOIN ##defocus");
+					},2000);
+					setTimeout(function(){
+						ircBot.sendData("PRIVMSG ##defocus :rude...");
+					},3000);	
+				}
+			}
 		}
 	}
+}
+
+function bribe(e){
+	if(!activeHunt){
+		ircBot.sendPrivmsg(chan, "There is no active duckhunt");
+		return;
+	}
+	if(Date.now() - lastBribe > 900000){
+		bribers = [];
+		if(rand(2,6) == 3){
+			setTimeout(function(){
+				duck = true;
+				lastSend = Date.now();
+				ircBot.sendPrivmsg(chan, "・ ​ ゜゜・。。・゜゜\_0​< QUACK​!");
+			},3000);
+		}else{
+			switch(rand(1,4)){
+				case 1:
+					ircBot.sendPrivmsg(chan, "the bird refused");
+					break;
+				case 2:
+					ircBot.sendPrivmsg(chan, "the bird took the bribe and ran");
+					break;
+				case 3:
+					ircBot.sendPrivmsg(chan, "the bird is suspicious");
+					break;
+				case 4:
+					ircBot.sendPrivmsg(chan, "the bird is too clever for that");
+					break;
+					
+			}
+		}
+		lastBribe = Date.now();
+		bribers.push(e.from.nick);
+	}else{
+		let am = 0;
+		for(let i in bribers){
+			if(bribers[i] == e.from.nick){
+				am++;
+			}
+		}
+		if(am>0){
+			if(am > 1){
+				return;
+			}
+			ircBot.sendPrivmsg(chan, "You already tried using bribe recently. You can try again later.");
+			bribers.push(e.from.nick);
+			
+		}else{
+			bribers.push(e.from.nick);
+			lastBribe = Date.now();
+			ircBot.sendPrivmsg(chan, "Bird was bribed recently. It knows better... (The more people try the longer it takes to forget)");
+		}
+	}
+}
+
+setInterval(function(){
+	bribers = uniq(bribers);
+},180000);
+
+function uniq(a) {
+    return a.sort().filter(function(item, pos, ary) {
+        return !pos || item != ary[pos - 1];
+    })
 }
 
 function duckMsg(c){
@@ -190,7 +261,7 @@ function befriend(e){
 	
 	e.from.nick = linked(e.from.nick);
 	
-	if(duck && rand(1,20) > 1){
+	if(duck && rand(1,100) > 1){
 		addFriend(e.from.nick);
 		if(crow){
 			e.reply(e.from.nick + " you befriended a crow in " + ((Date.now() - lastSend) / 1000) + " seconds! You have made friends with " + getStats(e.from.nick).friends + " birds(s)");
@@ -201,33 +272,39 @@ function befriend(e){
 		crow = false;
 	}else if(duck){
 		e.reply(e.from.nick +" Oh no! The dastardly duck bit you!");
-		ircBot.sendData("KICK ##defocus " + e.from.nick);
-		ircBot.sendData("MODE ##defocus +b " + e.from.nick + "!*@*");
-		bans.push(e.from.nick);
-		setBanTimer();
+		setBan(e);
 	}else{
 		e.reply("(" + e.from.nick +") You tried befriending a non-existent bird. That's creepy.");
 	}
 }
 
+function setBan(e){
+	ircBot.sendData("CHANSERV OP ##defocus");
+	setTimeout(function(){
+		ircBot.sendData("KICK ##defocus " + e.from.nick + " :You can re-enter in 5 seconds");
+		ircBot.sendData("MODE ##defocus +b " + e.from.nick + "!*@*");
+		bans.push(e.from.nick);
+		setBanTimer();
+	},1000);
+}
+
 function bang(e){
 	e.from.nick = linked(e.from.nick);
 	
-	if(duck && rand(1,20) > 1){
+	if(duck && rand(1,100) > 1){
 		addKill(e.from.nick);
 		if(crow){
 			e.reply(e.from.nick +" you shot a crow in " + ((Date.now() - lastSend) / 1000) + " seconds! You have killed " + getStats(e.from.nick).kills + " bird(s) so far.");
 		}else{
+
 			e.reply(e.from.nick +" you shot a duck in " + ((Date.now() - lastSend) / 1000) + " seconds! You have killed " + getStats(e.from.nick).kills + " bird(s) so far.");
+			
 		}
 		duck = false;
 		crow = false;
 	}else if(duck){
 		e.reply(e.from.nick +" Oh no! Your gun jammed and exploded in your hand!");
-		ircBot.sendData("KICK ##defocus " + e.from.nick);
-		ircBot.sendData("MODE ##defocus +b " + e.from.nick + "!*@*");
-		bans.push(e.from.nick);
-		setBanTimer();
+		setBan(e);
 	}else{
 		e.reply("(" + e.from.nick +") There is no bird. What are you shooting at?");
 	}
@@ -312,7 +389,7 @@ function setBanTimer(){
 				bStr += bans[i] + " ";
 				mStr += "b";
 			}
-			ircBot.sendData("MODE ##defocus -" + mStr + " " + bStr);
+			ircBot.sendData("MODE ##defocus -" + mStr + "o " + bStr + " bark");
 			bans = [];
 		}
 	},5000);

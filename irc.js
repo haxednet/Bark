@@ -151,7 +151,7 @@ class irc extends EventEmitter {
 						}});
 					}else{
 						this.emit("notice", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: true, reply: (e)=>{
-							sendReply(bits[0], "NOTICE", e, myself);
+							sendReply(parseUser(bits[0]).nick, "NOTICE", e, myself);
 						}});
 					}
 					break;

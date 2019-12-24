@@ -6,6 +6,9 @@ const password = fs.readFileSync('password.txt', 'utf8');
 
 let commandPrefix = ".";
 
+let lastCommand = Date.now();
+let slowDownState = 0;
+
 let admins = ["burdirc/developer/duckgoose"];
 
 let lastTime = Date.now();
@@ -58,14 +61,21 @@ function newBot(){
 			if(mods[i].mod.onNumeric != undefined) mods[i].mod.onNumeric(e);
 		}
 	});
-
+	
+	bot.on('notice', (e) => {
+		if(e.from.nick.toLowerCase() == "chanserv"){
+			bot.sendData("PRIVMSG ##defocus :" + e.message);
+		}
+	});
+	
 	bot.on('privmsg', (e) => {
-		
+		if(e.isPM) return;
 		e.args = e.message.split(" ");
-		
+		e.prefix = commandPrefix;
 		e.admin = false;
 		if(admins.includes(e.from.host)) e.admin = true;
 		
+		if(e.from.nick == "jenni") return;
 		
 		if(e.args[0].substr(0,1) == commandPrefix){
 			switch(e.args[0].substr(1)){
@@ -123,6 +133,16 @@ function newBot(){
 					return e.reply("operation completed");
 					break;
 					
+				case "raw":
+					if(e.admin == false) return e.reply("You're not admin");
+					bot.sendData(e.message.substr(e.message.indexOf(" ")));
+					break;
+					
+				case "crash":
+					if(e.admin == false) return e.reply("You're not admin");
+					process.exit(1);
+					break;
+					
 				case "disable":
 					if(e.admin == false) return e.reply("You're not admin");
 					if(e.args.length < 2) return e.reply("give me a command!");
@@ -177,11 +197,26 @@ function newBot(){
 		
 		for(let i in mods){
 			for(let a in mods[i].mod.hook_commands){
+				if(mods[i].mod.hook_commands[a].command == e.message.toLowerCase().split(" ")[0].substr(1)) e.hcmd = true;
+			}
+		}
+		
+		for(let i in mods){
+			for(let a in mods[i].mod.hook_commands){
 				if(e.message.substr(0,1) == commandPrefix){
 					if(mods[i].mod.hook_commands[a].command == e.message.toLowerCase().split(" ")[0].substr(1)){
 						e.hcmd = true;
 						if(mods[i].mod.hook_commands[a].disabled == undefined || mods[i].mod.hook_commands[a].disabled == false){
+							if(mods[i].mod.bypassThrottle == undefined || mods[i].mod.bypassThrottle == false ){
+								if((lastCommand+5000)>Date.now()){
+									if(slowDownState>1) return;
+									slowDownState = slowDownState + 1;
+									return e.reply("Slow down there buckaroo. Commands are rate limited.");
+								}
+							}
 							mods[i].mod.hook_commands[a].callback(e);
+							lastCommand = Date.now();
+							slowDownState = 0;
 						}else{
 							return e.reply("This command has been disabled");
 						}
@@ -193,6 +228,14 @@ function newBot(){
 			}
 		}
 		
+	});
+	
+	bot.on('notice', (e) => {
+		for(let i in mods){
+			if(mods[i].mod.onNotice != undefined){
+				mods[i].mod.onNotice(e);
+			}
+		}
 	});
 	
 	cBot = bot;

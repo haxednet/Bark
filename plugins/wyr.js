@@ -2,12 +2,14 @@ const http = require('http');
 
 const mod = {
 	hook_commands: [
-		{command: "wyr", usage: "Gets a random \"would you rather\" question. command accepts no arguments.", disabled: true, callback: (e)=>{
+		{command: "wyr", usage: "Gets a random \"would you rather\" question. command accepts no arguments.", callback: (e)=>{
 			httpGet("http://api.haxed.net/wyr/", (a)=>{
 				if(a.length > 3){
 					let J = JSON.parse(a);
 					if(J.question){
-						e.reply(J.question.twitter_sentence);
+						let rtxt = J.question.twitter_sentence.replace(" or ", " (" + J.question.option1_total + ") OR B) ").replace("Would you rather", "Would you rather A) ") + " (" + J.question.option2_total + ")";
+						rtxt = rtxt + " Winner: " + (J.question.answer == "1" ? "A" : "B");
+						e.reply(rtxt);
 					}else{
 						e.reply("Nothing found :(");
 					}
