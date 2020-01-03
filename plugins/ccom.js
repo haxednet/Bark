@@ -4,6 +4,7 @@ const querystring = require("querystring");
 
 let lastSend = 0;
 let coms = require("./data/ccom.json");
+let maps = require("./data/maps.json");
 let rated = false;
 
 const mod = {
@@ -16,6 +17,7 @@ const mod = {
 							e.reply("Command rejected because it contains banned words");
 						}else if(e.args[2].match(/[^ -~]+/g) == null){
 							const code = e.message.substr(11 + e.args[2].length);
+
 							//coms.push({command: args[3], code: code, user: e.from, date: Date.now()});
 							const uri = "http://a.haxed.net/test.php?from=" + base64(e.from.nick) + "&line=" + base64(e.message) + "&code=" + base64(code);
 							request.get(uri, function (error, response, body) {
@@ -49,11 +51,17 @@ const mod = {
 					}else{
 						e.reply("Not enough arguments. for help see https://haxed.net/ccom.html");
 					}
+				}else if(e.args[1] == "count"){
+					return e.reply("There are " + coms.length + " ccoms currently");
 				}else if(e.args[1] == "remove"){
 					if(e.args.length == 3){
+						if(maps[e.args[2].toLowerCase()] != undefined){
+							delete maps[e.args[2].toLowerCase()];
+							return e.reply("The map has been removed");
+						}
 						for(let i in coms){
 							if(coms[i].command.toLowerCase() == e.args[2].toLowerCase()){
-								if(coms[i].user.nick == e.from.nick){
+								if(coms[i].user.nick == e.from.nick || e.admin){
 									coms.splice(i,1);
 									fs.writeFileSync('./plugins/data/ccom.json', JSON.stringify(coms), 'utf8');
 									return e.reply("Command has been removed");
@@ -76,6 +84,35 @@ const mod = {
 						}
 					}
 					e.reply("Command not found");
+				}else if(e.args[1] == "map"){
+					if(e.args.length < 4){
+						e.reply("Invalid command usage. for help see https://haxed.net/ccom.html");
+					}else{
+						e.args[2] = e.args[2].toLowerCase();
+						e.args[3] = e.args[3].toLowerCase();
+						for(let i in coms){
+							if(coms[i].command.toLowerCase() == e.args[2]){
+								return e.reply(e.args[2] + " is already a ccom and can't be remapped");
+							}
+						}
+						for(let i in coms){
+							if(coms[i].command.toLowerCase() == e.args[3]){
+								maps[e.args[2]] = e.args[3];
+								e.reply(e.args[2] + " is now mapped to " + e.args[3]);
+								fs.writeFileSync('./plugins/data/maps.json', JSON.stringify(maps), 'utf8');
+								return;
+							}
+						}
+						for(let i in coms){
+							if(coms[i].command.toLowerCase() == e.args[3]){
+								maps[e.args[2]] = e.args[3];
+								e.reply(e.args[2] + " is now mapped to " + e.args[3]);
+								fs.writeFileSync('./plugins/data/maps.json', JSON.stringify(maps), 'utf8');
+								return;
+							}
+						}
+						e.reply("The ccom wasn't found");
+					}
 				}else{
 					e.reply("Invalid command usage. for help see https://haxed.net/ccom.html");
 				}
@@ -86,7 +123,12 @@ const mod = {
 		console.log(e.hcmd);
 		if(e.hcmd) return;
 		if(rated) return;
+		//maps[e.args[2]]
+
 		if(e.message.substr(0,1) == e.prefix){
+			if(maps[e.args[0].substr(1).toLowerCase()] != undefined){
+				e.args[0] = e.prefix + maps[e.args[0].substr(1).toLowerCase()];
+			}
 			console.log("ok1");
 			for(let i in coms){
 				console.log(coms[i].command.toLowerCase());
