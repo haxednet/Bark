@@ -44,7 +44,7 @@ const mod = {
 			}
 		}},
 		
-		{command: "birdforce", hidden: true, callback: (e)=>{
+		{command: "birdforcee", hidden: true, callback: (e)=>{
 			if(e.admin){
 				duck = true;
 				if(e.message.indexOf("crow") > 0) crow = true;
@@ -91,12 +91,37 @@ const mod = {
 
 		}},
 		
+		{command: "xfer", hidden: true, usage: "shh", callback: (e)=>{
+			
+			let bits = e.message.toLowerCase().substr(6).split(" ");
+			// .xfer friends hoffman duckgoose 20
+			if(e.admin){
+				var s1 = stats[bits[1]];
+				var s2 = stats[bits[2]];
+				var amount = parseInt(bits[3]);
+				if(bits[0] == "friends"){
+					e.reply("gave " + amount + " of " + bits[1] + "'s ducks to " + bits[2] );
+					stats[bits[1]].friends = s1.friends - amount;
+					stats[bits[2]].friends = s2.friends + amount;
+				}else if(bits[0] == "kills"){
+					e.reply("gave " + amount + " of " + bits[1] + "'s kills to " + bits[2] );
+					stats[bits[1]].kills = s1.kills - amount;
+					stats[bits[2]].kills = s2.kills + amount;
+				}else{
+					e.reply("you're doing it wrong");
+				}
+				saveStats();
+			}else{
+				e.reply("You're not an admin! not listening to you. 🙉");
+			}
+		}},
+		
 		{command: "starthunt", callback: (e)=>{
 			e.reply("Birds have been spotted nearby. See how many you can shoot or save. use .bang to shoot or .befriend to save them.");
 			activeHunt = true;
 		}},
 		
-		{command: "birds", usage: "Gte the hunting stats for a given user. Usage: $birds duckgoose", callback: (e)=>{
+		{command: "birds", usage: "Get the hunting stats for a given user. Usage: $birds duckgoose", callback: (e)=>{
 			let theUser = e.message.substr(7).replace(" ", "");
 			if(theUser == ""){
 				e.from.nick = linked(e.from.nick);
@@ -182,7 +207,7 @@ function bribe(e){
 				duck = true;
 				lastSend = Date.now();
 				ircBot.sendPrivmsg(chan, "・ ​ ゜゜・。。・゜゜\_0​< QUACK​!");
-			},3000);
+			},100);
 		}else{
 			switch(rand(1,4)){
 				case 1:

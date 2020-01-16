@@ -9,7 +9,7 @@ let commandPrefix = ".";
 let lastCommand = Date.now();
 let slowDownState = 0;
 
-let admins = ["burdirc/developer/duckgoose"];
+let admins = ["burdirc/developer/duckgoose", "gateway/tor-sasl/hoffman", "freenode/father-christmas/kindone"];
 
 let lastTime = Date.now();
 let mods = [];
@@ -45,7 +45,6 @@ function newBot(){
 	});
 
 	bot.on('data', (e) => {
-		console.log(e);
 		
 		if(e.toLowerCase().indexOf("amIalive") > -1){
 			lastTime = Date.now();
@@ -69,16 +68,29 @@ function newBot(){
 	});
 	
 	bot.on('privmsg', (e) => {
-		if(e.isPM) return;
+		
 		e.args = e.message.split(" ");
 		e.prefix = commandPrefix;
 		e.admin = false;
 		if(admins.includes(e.from.host)) e.admin = true;
 		
+		if(e.isPM && e.admin == false) return;
+		
 		if(e.from.nick == "jenni") return;
+		
+		if(e.message.toLowerCase() == "!ops") e.reply(e.from.nick + ": SHUT THE FUCK UP");
 		
 		if(e.args[0].substr(0,1) == commandPrefix){
 			switch(e.args[0].substr(1)){
+				case "admin":
+					if(e.args.length == 3){
+						if(e.args[1] == "add"){
+							admins.push(e.args[2]);
+						}else if(e.args[1] == "remove"){
+							admins.splice(admins.indexOf(e.args[2]), 1);
+						}
+					}
+					break;
 				case "reload":
 					if(e.admin == false) return e.reply("You're not admin");
 					if (fs.existsSync("./plugins/" + e.args[1])) {
@@ -103,6 +115,7 @@ function newBot(){
 				case "whoami":
 					e.reply(JSON.stringify(e.from));
 					break;
+					
 				case "coms":
 					let c = "";
 					for(let i in mods){
@@ -128,13 +141,14 @@ function newBot(){
 
 				case "prefix":
 					if(e.admin == false) return e.reply("You're not admin");
-					if(e.args.length < 1 || e.args[1].length < 1) return e.reply("Invalid prefix input");
+					if(e.args.length < 2 || e.args[1].length < 1) return e.reply("Invalid prefix input");
 					commandPrefix = e.args[1];
 					return e.reply("operation completed");
 					break;
 					
 				case "raw":
 					if(e.admin == false) return e.reply("You're not admin");
+					if(e.args.length < 2) return e.reply("Not enough arguments");
 					bot.sendData(e.message.substr(e.message.indexOf(" ")));
 					break;
 					
@@ -146,6 +160,7 @@ function newBot(){
 				case "disable":
 					if(e.admin == false) return e.reply("You're not admin");
 					if(e.args.length < 2) return e.reply("give me a command!");
+					if(e.args.length < 2) return e.reply("Not enough arguments");
 					for(let i in mods){
 						for(let a in mods[i].mod.hook_commands){
 							if(e.args[1] == commandPrefix + mods[i].mod.hook_commands[a].command){
@@ -161,6 +176,7 @@ function newBot(){
 				case "enable":
 					if(e.admin == false) return e.reply("You're not admin");
 					if(e.args.length < 2) return e.reply("give me a command!");
+					if(e.args.length < 2) return e.reply("Not enough arguments");
 					for(let i in mods){
 						for(let a in mods[i].mod.hook_commands){
 							if(e.args[1] == commandPrefix + mods[i].mod.hook_commands[a].command){
@@ -208,8 +224,8 @@ function newBot(){
 						e.hcmd = true;
 						if(mods[i].mod.hook_commands[a].disabled == undefined || mods[i].mod.hook_commands[a].disabled == false){
 							if(mods[i].mod.bypassThrottle == undefined || mods[i].mod.bypassThrottle == false ){
-								if((lastCommand+5000)>Date.now()){
-									if(slowDownState>1) return;
+								if((lastCommand+5000)>Date.now() && e.admin == false){
+									if(slowDownState>4) return;
 									slowDownState = slowDownState + 1;
 									return e.reply("Slow down there buckaroo. Commands are rate limited.");
 								}

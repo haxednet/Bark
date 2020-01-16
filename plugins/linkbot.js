@@ -20,7 +20,7 @@ const mod = {
 				return;
 			}
 		}
-		
+		console.log("YOUTUBE " + vid + " " + e.message);
 		if(vid){
 			request.get('https://www.googleapis.com/youtube/v3/videos?key=AIzaSyC7B1M3dlTaGMc9EOYNzy6u8nHAgfqHALY&part=snippet&id=' + vid, function (error, response, body) {
 				if (!error && response.statusCode == 200) {
