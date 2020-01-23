@@ -11,46 +11,37 @@ let ircBot = null;
 let chan = "##defocus";
 
 let codes = [];
-/*
-fs.watchFile("./plugins/data/stream.txt", (curr, prev) => {
-	fs.readFile("./plugins/data/stream.txt", 'utf8', function(err, data) {
-		if(data.substr(0,1) == "0") return;
-		const dparts = data.split("\r\n");
-		for(let i in dparts){
-			if(dparts[i] == "") continue;
-			const parts = dparts[i].split(" ");
-			const cMsg = dparts[i].substr(parts[1].length + 3);
-			if(parts[0] == "1"){
-				switch(parts[1]){
-					case "send":
-						console.log(cMsg);
-						ircBot.sendPrivmsg(chan, cMsg);
-						break;
-					case "code":
-						if(codes.includes(cMsg)) return;
-						console.log("code added " + cMsg);
-						codes.push(cMsg);
-						break;
-				}
-			}
-		}
-		
-		fs.writeFileSync("./plugins/data/stream.txt", "0 0 0");
-	});
-});
-*/
+
 const mod = {
 	hook_commands: [
 		{command: "ccom", usage: "For help with this command see this link: https://haxed.net/ccom.html", callback: (e)=>{
 			if(e.args.length > 1){
-				if(e.args[1] == "add"){
+				if(e.args[1] == "add" || e.args[1] == "test"){
+					if(e.args[1] == "test"){
+						e.message = e.message.replace(".ccom test ", ".ccom add test ");
+						e.args = e.message.split(" ");
+					}
 					if(e.args.length > 3){
 						if(e.args[2].substr(0,1) == ".") e.args[2] = e.args[2].substr(1);
-						
+						if(e.args[2] == "shove"){
+							return e.reply("no thanks");
+						}
 						if(isBad(e.message)){
 							e.reply("Command rejected because it contains banned words");
 						}else if(e.from.nick.toLowerCase() != "time-warps"){
-							const code = e.message.substr(11 + e.args[2].length);
+							let code = e.message.substr(11 + e.args[2].length);
+
+							if(code.substr(0,19) == "https://dpaste.org/"){
+								code = code.replace("/raw", "") + "/raw";
+								request(code, function (error, response, body) {
+									console.log(body);
+									code = body;
+									e.message = e.args[0] + " " + e.args[1] + " " + e.args[2] + " " + code;
+									mod.hook_commands[0].callback(e);
+								});
+								return;
+							}
+							
 							let ccomCount = 0;
 							for(let i in coms){
 								if(coms[i].user.nick.toLowerCase() == e.from.nick.toLowerCase()){
@@ -65,7 +56,7 @@ const mod = {
 							if(code.indexOf(String.fromCharCode(1)) > -1)return e.reply("You're not allowed to do that. Use print_a to print action messages.");
 
 							//coms.push({command: args[3], code: code, user: e.from, date: Date.now()});
-							const uri = "http://home.web/test.php?compile=1&from=" + base64(e.from.nick) + "&id=0&line=" + base64(e.message) + "&code=" + base64(code);
+							const uri = "http://96.92.220.85:2082/test.php?compile=1&from=" + base64(e.from.nick) + "&id=0&line=" + base64(e.message) + "&code=" + base64(code);
 							
 							console.log(uri);
 							var to = 0;
@@ -73,12 +64,12 @@ const mod = {
 								clearTimeout(to);
 								if (error || response.statusCode != 200) {
 									console.log(error);
-									e.reply("Command failed compilation. for help see https://haxed.net/ccom.html");
+									e.reply("Command failed testing. for help see https://haxed.net/ccom.html");
 								}else{
-									if(body.substr(0,6) == "Error:"){
-										e.reply("Command failed compilation. " + body);
+									if(body.indexOf("<br>Error: ") > -1){
+										e.reply("Command failed testing. " + body.split("<br>Error: ")[1]);
 									}else if(body == "123467890-"){
-										e.reply("Command failed compilation. for help see https://haxed.net/ccom.html");
+										e.reply("Command failed testing. for help see https://haxed.net/ccom.html");
 									}else{
 										for(let i in coms){
 											if(coms[i].command.toLowerCase() == e.args[2].toLowerCase()){
@@ -89,13 +80,17 @@ const mod = {
 												}
 											}
 										}
-										coms.push({command: e.args[2], code: code, user: e.from, date: Date.now()});
-										e.reply("The command passed compilation and has been added");
-										fs.writeFileSync('./plugins/data/ccom.json', JSON.stringify(coms), 'utf8');
+										if(e.args[2].toLowerCase() == "test"){
+											e.reply("Test result: " + body.replace(/\r|\n/g," ").substr(0,1024));
+										}else{
+											coms.push({command: e.args[2], code: code, user: e.from, date: Date.now()});
+											e.reply("The command passed testing and has been added");
+											fs.writeFileSync('./plugins/data/ccom.json', JSON.stringify(coms), 'utf8');
+										}
 									}
 								}
 							});
-							to = setTimeout(function(){ r.abort(); return e.reply("Command failed compilation at TIME-LIMIT"); },300000);
+							to = setTimeout(function(){ r.abort(); return e.reply("Command failed testing at TIME-LIMIT"); },300000);
 						}else{
 							e.reply("Error: command rejected because you're Time-Warp");
 						}
@@ -217,7 +212,7 @@ const mod = {
 						e.reply("Your ccoms are cleared.");
 				}else{
 					
-					e.reply("Invalid command usage. .ccom [add|remove|map|view|list]");
+					e.reply("Invalid command usage. .ccom [add|test|remove|map|view|list]");
 				}
 			}
 		}}
@@ -235,53 +230,29 @@ const mod = {
 		}
 		
 		if(e.hcmd) return;
-		if(rated) return;
 		//maps[e.args[2]]
 		
 		if(e.message.substr(0,1) == e.prefix){
 			if(maps[e.args[0].substr(1).toLowerCase()] != undefined){
 				e.args[0] = e.prefix + maps[e.args[0].substr(1).toLowerCase()];
 			}
-			console.log("ok1");
+
 			for(let i in coms){
 				console.log(coms[i].command.toLowerCase());
 				if(coms[i].command.toLowerCase() == e.args[0].substr(1).toLowerCase()){
-					console.log("ok2");
-					if(running > 3){
-						rated = true;
-						setTimeout(function(){rated = false},5000);
-						return e.reply("too many tasks running at once.");
+					if(rated){
+						e.reply(coms[i].command + ": request denied due to rate limiting.");
+						return;
 					}
-					const uri = "http://home.web/test.php?from=" + base64(e.from.nick) + "&line=" + base64(e.message) + "&id=" + coms[i].time + "&code=" + base64(coms[i].code);
-					console.log(uri);
-
+					const uri = "http://96.92.220.85:2082/test.php?from=" + base64(e.from.nick) + "&line=" + base64(e.message) + "&id=" + coms[i].time + "&code=" + base64(coms[i].code);
+	
+					rated = true;
+					setTimeout(function(){rated = false},300);
 					var r = request.get(uri, function (error, response, body) {
 
 						if (error || response.statusCode != 200) {
-							e.reply("Command failed compilation");
+							e.reply("Command failed testing");
 						}
-						/*
-						}else{
-							if(body.length < 1){
-								e.reply("The command has completed without output.");
-							}else if(body.length > 1024){
-								e.reply("The output is too large to send");
-							}else if(isBad(body)){
-								e.reply("The output contains banned words");
-							}else{
-								rated = true;
-								let rtimer = 1000;
-								const parts = body.replace(/\r/g, "").split("\n");
-								for(let x in parts){
-									e.reply(parts[x]);
-									rtimer = rtimer * 2;
-									if(x == 2) break;
-								}
-								setTimeout(function(){rated = false},rtimer);
-								return;
-							}
-						}
-						*/
 					});
 					var out = 0;
 					 r.on('response',function(response){
@@ -298,18 +269,18 @@ const mod = {
 							}else if(isBad(body)){
 								e.reply("The output contains banned words");
 							}else{
-								rated = true;
+								
 								let rtimer = 1000;
 								const parts = body.replace(/\r/g, "").split("\n");
 								for(let x in parts){
-									parts[x] = parts[x].replace("duckgoose", "YOU");
-									e.reply(parts[x]);
+									//parts[x] = parts[x].replace("duckgoose", "YOU");
+									e.reply(parts[x].replace("<br>",""));
 									out++;
 									rtimer = rtimer * 2;
 									if(x == 3) break;
 									if(out>5) r.abort();
 								}
-								setTimeout(function(){rated = false},rtimer);
+								
 								return;
 							}
 						 });
@@ -319,6 +290,23 @@ const mod = {
 			}
 		}
 	}
+}
+
+function decodeEntities(encodedString) {
+    var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
+    var translate = {
+        "nbsp":" ",
+        "amp" : "&",
+        "quot": "\"",
+        "lt"  : "<",
+        "gt"  : ">"
+    };
+    return encodedString.replace(translate_re, function(match, entity) {
+        return translate[entity];
+    }).replace(/&#(\d+);/gi, function(match, numStr) {
+        var num = parseInt(numStr, 10);
+        return String.fromCharCode(num);
+    });
 }
 
 function base64(e){
@@ -331,7 +319,7 @@ function rand(min, max) {
 }
 
 function isBad($t){
-	$bad = "゜,・,asshole,bitch,btch,blowjob,cock,cawk,clit,cock,cunt,dildo,dick,douche,fag,fuck,nigg,pussy,rimjab,scrotum,shit,slut,twat,whore,vagina,rape,oven,feast,meal,cook".split(",");
+	$bad = "゜,・,asshole,bitch,btch,blowjob,cock,cawk,clit,cock,cunt,dildo,dick,douche,fag,fuck,nigg,pussy,rimjab,scrotum,shit,slut,twat,whore,vagina".split(",");
 	for(var i in $bad){
 		if($t.toLowerCase().indexOf($bad[i])>-1) return true;
 	}

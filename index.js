@@ -41,7 +41,7 @@ function newBot(){
 		ident: "Grr",
 		realNme: "Woof",
 		auth: {type: "sasl_plain", user: "bark", password: password},
-		channels: ["##defocus"]
+		channels: ["##defocus","##barkbarkbark"]
 	});
 
 	bot.on('data', (e) => {
@@ -81,6 +81,7 @@ function newBot(){
 		if(e.message.toLowerCase() == "!ops") e.reply(e.from.nick + ": SHUT THE FUCK UP");
 		
 		if(e.args[0].substr(0,1) == commandPrefix){
+			fs.appendFileSync('out.txt', e.from.nick + ": " + e.message + "\r\n");
 			switch(e.args[0].substr(1)){
 				case "admin":
 					if(e.args.length == 3){
@@ -113,6 +114,7 @@ function newBot(){
 					}
 					break;
 				case "whoami":
+					if(e.admin) e.from.admin = true;
 					e.reply(JSON.stringify(e.from));
 					break;
 					

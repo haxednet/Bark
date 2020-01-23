@@ -6,23 +6,23 @@ const mod = {
 	],
 	
 	onPrivmsg: (e)=>{
-		if(Date.now()-lastSend<10000) return;
+		if(Date.now()-lastSend<2000) return;
 		lastSend = Date.now();
 		let vid = false;
 		let sp = e.message.split(" ");
 		let urlR = /(http|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/i
 		
 		for(let i in sp){
-			if(vid == false){
+			if(vid === false){
 				vid = youtube_parser(sp[i]);
 			}
 			if(sp[i] == "silent"){
 				return;
 			}
 		}
-		console.log("YOUTUBE " + vid + " " + e.message);
+		
 		if(vid){
-			request.get('https://www.googleapis.com/youtube/v3/videos?key=AIzaSyC7B1M3dlTaGMc9EOYNzy6u8nHAgfqHALY&part=snippet&id=' + vid, function (error, response, body) {
+			request.get('https://www.googleapis.com/youtube/v3/videos?key=AIzaSyCrTbpjMiMM7Edsp-ewTu--d7dBkCDx_xE&part=snippet&id=' + vid, function (error, response, body) {
 				if (!error && response.statusCode == 200) {
 					let j = JSON.parse(body);
 					console.log(j);

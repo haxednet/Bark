@@ -9,7 +9,9 @@ const mod = {
 			if(local.length > 1){
 				request.get('https://api.haxed.net/answers/?key=dfuigh84hg&q=' + local, function (error, response, body) {
 					if (!error && response.statusCode == 200) {
-						e.reply(body);
+						const bx = body.split("<br>");
+						e.reply(bx[0]);
+						e.reply(bx[1]);
 					}
 				});
 			}
@@ -32,7 +34,10 @@ const mod = {
 			}
 		}}
 	],
-	onBot: function(a){ircBot = a;}
+	onBot: function(a){ircBot = a;},
+	onPrivmsg: (e)=>{
+		if(e.message.substr(0,8) == "!voteban") e.reply("we don't do that shit");
+	}
 }
 
 

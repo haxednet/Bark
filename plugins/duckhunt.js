@@ -117,6 +117,7 @@ const mod = {
 		}},
 		
 		{command: "starthunt", callback: (e)=>{
+			if(e.to != chan) return;
 			e.reply("Birds have been spotted nearby. See how many you can shoot or save. use .bang to shoot or .befriend to save them.");
 			activeHunt = true;
 		}},
@@ -196,6 +197,7 @@ const mod = {
 }
 
 function bribe(e){
+	if(e.to != chan) return;
 	if(!activeHunt){
 		ircBot.sendPrivmsg(chan, "There is no active duckhunt");
 		return;
@@ -283,7 +285,7 @@ function duckMsg(c){
 }
 
 function befriend(e){
-	
+	if(e.to != chan) return;
 	e.from.nick = linked(e.from.nick);
 	
 	if(duck && rand(1,100) > 1){
@@ -314,6 +316,7 @@ function setBan(e){
 }
 
 function bang(e){
+	if(e.to != chan) return;
 	e.from.nick = linked(e.from.nick);
 	
 	if(duck && rand(1,100) > 1){
