@@ -82,7 +82,7 @@ const mod = {
 								
 								const formData = {
 									compile: 1,
-									key: "Uc8ejdywi",
+									key: apiKey,
 									channel: e.to,
 									from: e.from.nick,
 									id: 0,
@@ -340,7 +340,7 @@ const mod = {
 					//const uri = "http://96.92.220.85:2082/test.php?from=" + base64(e.from.nick) + "&line=" + base64(e.message) + "&id=" + coms[i].time + "&code=" + base64(coms[i].code);
 					const formData = {
 						compile: 1,
-						key: "Uc8ejdywi",
+						key: apiKey,
 						channel: e.to,
 						from: e.from.nick,
 						id: 0,
