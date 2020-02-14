@@ -24,6 +24,7 @@ const mod = {
 		{command: "8ball", usage: "A magic 8ball that has no real value at all. Usage: $8ball is duckgoose cool?", callback: (e)=>{
 			if(e.args.length > 1){
 				let re = replies[rand(0,replies.length-1)];
+				if(e.message.indexOf("duckgoose")>-1) return e.reply("duckgoose is cool");
 				e.reply(e.from.nick + ": " + re);
 			}
 		}}

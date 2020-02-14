@@ -12,7 +12,7 @@ let lastActive = 0;
 
 let bribers = [];
 
-let lastBribe = 0;
+let lastBribe = Date.now();
 
 let timer = 0;
 
@@ -169,7 +169,7 @@ const mod = {
 				clearTimeout(whoTimer);
 				whoTimer = setTimeout(function(){
 					links = [];
-					ircBot.sendData("WHO " + chan + " %na");
+					//ircBot.sendData("WHO " + chan + " %na");
 				},5000);
 			}
 			if(ds[1] == "KICK"){
@@ -306,13 +306,10 @@ function befriend(e){
 }
 
 function setBan(e){
-	ircBot.sendData("CHANSERV OP ##defocus");
-	setTimeout(function(){
 		ircBot.sendData("KICK ##defocus " + e.from.nick + " :You can re-enter in 5 seconds");
 		ircBot.sendData("MODE ##defocus +b " + e.from.nick + "!*@*");
 		bans.push(e.from.nick);
 		setBanTimer();
-	},1000);
 }
 
 function bang(e){
@@ -417,7 +414,7 @@ function setBanTimer(){
 				bStr += bans[i] + " ";
 				mStr += "b";
 			}
-			ircBot.sendData("MODE ##defocus -" + mStr + "o " + bStr + " bark");
+			ircBot.sendData("MODE ##defocus -" + mStr + "o " + bStr + " ");
 			bans = [];
 		}
 	},5000);

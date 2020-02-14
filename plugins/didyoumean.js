@@ -29,7 +29,8 @@ const mod = {
 			try{
 				if(ebits.length == 4){
 					let re = new RegExp(ebits[1], ebits[3]);
-					let tc = cache.reverse();
+					let tc = cache.map(Array.apply.bind(Array, null));
+					tc.reverse();
 					for(let i in tc){
 						let m = tc[i][1].match(re);
 						if(m != null){

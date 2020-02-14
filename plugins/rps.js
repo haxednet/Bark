@@ -17,6 +17,7 @@ let gameTimer = 0;
 const mod = {
 	hook_commands: [
 		{command: "rps", usage: "Starts a game of rock–paper–scissors. Example usage: .rps duckgoose", callback: (e)=>{
+			if(e.message.toLowerCase().indexOf(" " + e.botNick.toLowerCase())>-1) return e.reply("I'm afraid I can't let you do that, " + e.from.nick);
 			if(e.args.length > 1){
 				if(game.player1.nick != "") return e.reply("Game already in progress...");
 				e.reply( e.args[1] + ": " + e.from.nick + " has challenged you to a game of rock–paper–scissors!");
