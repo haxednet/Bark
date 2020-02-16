@@ -61,11 +61,11 @@ class irc extends EventEmitter {
 		}
 		
 		this.client.on('error', function(data) {
-			
+			myself.emit("error", data);
 		});
 		
 		this.client.on('close', function(data) {
-			
+			myself.emit("closed");
 		});
 		
 		this.client.on('data', function(data) {

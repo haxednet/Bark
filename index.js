@@ -1,17 +1,19 @@
 const tls = require('tls');
 const fs = require('fs');
 const irc = require('./irc.js');
+const config = require('./config.json');
 
 const password = fs.readFileSync('password.txt', 'utf8');
+
 let ignoreList = [["*!*@unaffiliated/rtqp", 0, 0]];
 
-let commandPrefix = ".";
+let commandPrefix = config.commandPrefix;
 
 let lastCommand = Date.now();
 let slowDownState = 0;
 
-let admins = ["burdirc/developer/duckgoose", "gateway/tor-sasl/hoffman", "freenode/father-christmas/kindone"];
-let trusted = ["gateway/tor-sasl/apt-get-schwifty", "gateway/vpn/privateinternetaccess/sprinkls"];
+let admins = config.admins;
+let trusted = config.trusted;
 
 let lastTime = Date.now();
 let mods = [];
@@ -38,26 +40,25 @@ newBot();
 
 function newBot(){
 	const bot = new irc({
-		host: "irc.freenode.org",
-		port: 6697,
-		ssl: true,
-		nick: "Bark",
+		host: config.host,
+		port: config.port,
+		ssl: config.ssl,
+		nick: config.nick,
 		ident: "Grr",
 		realNme: "Woof",
 		auth: {type: "sasl_plain", user: "bark", password: password},
-		channels: ["##defocus","##barkbarkbark", "##fitness"]
+		channels: config.channels
 	});
 
 	bot.on('data', (e) => {
+
+		lastTime = Date.now();
 		
-		if(e.toLowerCase().indexOf("amIalive") > -1){
-			lastTime = Date.now();
-		}
 		
 		for(let i in mods){
 			if(mods[i].mod.onData != undefined) mods[i].mod.onData(e);
 		}
-		console.log(e);
+
 	});
 	
 	bot.on('numeric', (e) => {
@@ -86,7 +87,6 @@ function newBot(){
 		for(let i in tinyLog){
 			if(tinyLog[i][2] == e.to) e.log.push(tinyLog[i]);
 		}
-		
 		tinyLog.push([Date.now(), e.from.mask, e.to, e.message]);
 		
 		if(admins.includes(e.from.host)) e.admin = true;
@@ -365,6 +365,14 @@ function newBot(){
 		if(mods[i].mod.onBot != undefined) mods[i].mod.onBot(cBot);
 	}
 	
+	
+	bot.on("close", function(e){
+		console.log("I died");
+	});
+	
+	bot.on("error", function(e){
+		console.log("I died error");
+	});
 
 	
 }
@@ -395,8 +403,13 @@ function userAsRegex( e ){
 	returnStr = returnStr.replace( /\*/g, "(.*)" );
 	return new RegExp(returnStr, "ig");
 }
-/*
-setTimeout(function(){
 
-}, 30000);
-*/
+
+setInterval(function(){
+	/* timer to make sure the bot is alive */
+	cBot.sendData("PING :amIalive");
+	if((Date.now() - lastTime) > 60000){
+		process.exit();
+	}
+}, 20000);
+

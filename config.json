@@ -1,0 +1,12 @@
+{
+	"host": "irc.freenode.org",
+	"port": 6697,
+	"ssl": true,
+	"nick": "BarkTest",
+	"channels": ["##barkbarkbark"],
+	
+	"admins": ["burdirc/developer/duckgoose", "gateway/tor-sasl/hoffman", "freenode/father-christmas/kindone"],
+	"trusted": ["gateway/tor-sasl/apt-get-schwifty", "gateway/vpn/privateinternetaccess/sprinkls"],
+	
+	"commandPrefix": ","
+}
