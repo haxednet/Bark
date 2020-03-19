@@ -1,10 +1,14 @@
 const tells = [];
 let doTell = true;
+let banned = ["lapsang"];
 const mod = {
 	hook_commands: [
 		{command: "tell", hidden: true, callback: (e)=>{
 			let input = e.message.substr(7);
+            if(e.args.length < 3) return e.reply("Not enough parameters");
 			let who = e.args[1].toLowerCase();
+            if(e.from.nick.toLowerCase() == who.toLowerCase()) return e.reply("Tell it to yourself");
+            if(banned.includes(who)) return e.reply("I can't .tell to that user");
 			let ncount = 0;
 			for(let i in tells){
 				if(tells[i][0].toLowerCase() == who) ncount++;
@@ -13,6 +17,7 @@ const mod = {
 			tells.push([who,"<" + e.from.nick + "> " + e.message]);
 
 			e.reply("Ok I'll tell " + who + " you've said this");
+            
 		}}
 	],
 	onPrivmsg: (e)=>{

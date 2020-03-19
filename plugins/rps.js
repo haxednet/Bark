@@ -40,6 +40,9 @@ const mod = {
 	],
 	onBot: (e) => {ircBot = e;},
 	onNotice: (e) => {
+        e.message = e.message.replace("rock", "r");
+        e.message = e.message.replace("paper", "p");
+        e.message = e.message.replace("scissors", "s");
 		const lm = e.message.toLowerCase().replace(/\[|\]/, "");
 		if(lm == "r" || lm == "p" || lm == "s"){
 			
@@ -69,6 +72,15 @@ function checkForWin(){
 			ircBot.sendData("PRIVMSG " + channel + " :You've both chosen " + game.choices[p1.choice] + "! Try again");
 			p2.choice = "";
 			p1.choice = "";
+            gameTimer = setTimeout(function(){
+                if(game.player1.choice == "" || game.player2.choice == ""){
+                    ircBot.sendData("PRIVMSG " + channel + " :Waited 60 seconds for selection. Game ended.");
+                    game.player1.nick = "";
+                    game.player2.nick = "";
+                    game.player1.choice = "";
+                    game.player2.choice = "";
+                }
+            },60000);
 		}else{
 			const winner = win(p1.choice,p2.choice);
 			ircBot.sendData("PRIVMSG " + channel + " :" + winner.message + "! " + winner.nick + " wins!");

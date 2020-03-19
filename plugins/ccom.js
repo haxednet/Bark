@@ -1,7 +1,6 @@
 ﻿const fs = require('fs');
 const request = require('request');
 const querystring = require("querystring");
-const apiKey = fs.readFileSync('./plugins/data/apikey.txt', 'utf8');
 
 let lastSend = 0;
 let coms = require("./data/ccom.json");
@@ -17,15 +16,28 @@ let perms = {
 	"tv": {"kick": true},
 	"suicide": {"kick": true},
 	"cut": {"kick": true},
-	"die": {"kick": true, voice: true}
+	"die": {"kick": true, "voice": true},
+    "test2": {"kick": true, "voice": true},
+    "hail": {"kick": true, "voice": true},
+    "kick": {"kick": true, "voice": true}
 };
 
-let limitBypass = [
+var limitBypass = [
 	"sprinkles",
 	"apt-get-schwifty",
 	"time-warp",
 	"aloo_shu"
 ];
+
+function generateKey(){
+    const dateN = Date.now().toString().slice(0,-4);
+    const alpha = "AbCdEfGhIjKlMnOp";
+    let strKey = "";
+    for(let a in dateN){
+        strKey += alpha[dateN[a]];
+    }
+    return strKey
+}
 
 const mod = {
 	hook_commands: [
@@ -82,7 +94,7 @@ const mod = {
 								
 								const formData = {
 									compile: 1,
-									key: apiKey,
+									key: generateKey(),
 									channel: e.to,
 									from: e.from.nick,
 									id: 0,
@@ -92,15 +104,23 @@ const mod = {
 									users: JSON.stringify(ircBot.getChannelObject(e.to).users),
 									log: JSON.stringify(e.log)
 								};
-								
-								let r = request.post({url: uri, formData: formData}, function (error, response, body) {
+								console.log(formData);
+								var r = request.post({url: uri, formData: formData}, function (error, response, body) {
 									if (error || response.statusCode != 200) {
 										e.reply("Command failed testing. for help see https://trello.com/b/wz7ipI2G/bark-ccom-programming-examples");
 									}else{
 										if(body.indexOf("<br>Error: ") > -1){
-											e.reply("Command failed testing. " + body.split("<br>Error: ")[1]);
+											e.reply("Command failed testing. " + body.split("<br>Error: ")[1].replace(/\r|\n/g, " ") );
 										}else{
-											if(body.indexOf("@_+") == -1) e.reply("Test result: " + body.replace(/\r|\n/g," ").substr(0,1024));
+											if(body.indexOf("@_+") == -1){
+                                                const splits = body.replace(/\r/g, "").split("\n");
+                                                let counter = 0;
+                                                for(let j in splits){
+                                                    if(counter < 3 && splits[j].length > 0) e.reply("Test result: " + splits[j].replace(/\r|\n/g," ").substr(0,1024));
+                                                    counter++;
+                                                }
+                                                
+                                            }
 											return;
 										}
 									}
@@ -116,6 +136,7 @@ const mod = {
 										}
 									}
 								}
+                                if(maps[e.args[2].toLowerCase()] != undefined) return e.reply("This command already exists as a map");
 								coms.push({command: e.args[2], code: code, user: e.from, date: Date.now()});
 								e.reply("The command has been added");
 								fs.writeFileSync('./plugins/data/ccom.json', JSON.stringify(coms), 'utf8');
@@ -149,7 +170,7 @@ const mod = {
 									
 									
 									
-									return e.reply(reply + " Command " + e.args[2] + " has been removed.");
+									return e.reply(reply + "Command " + e.args[2] + " has been removed.");
 								}else{
 									return e.reply("You may not edit a command you didn't add");
 								}
@@ -337,10 +358,10 @@ const mod = {
 					console.log(uri);
 					rated = true;
 					setTimeout(function(){rated = false},1000);
-					//const uri = "http://96.92.220.85:2082/test.php?from=" + base64(e.from.nick) + "&line=" + base64(e.message) + "&id=" + coms[i].time + "&code=" + base64(coms[i].code);
+					//const uri = "http://mortongrove.haxed.net:2082/test.php?from=" + base64(e.from.nick) + "&line=" + base64(e.message) + "&id=" + coms[i].time + "&code=" + base64(coms[i].code);
 					const formData = {
 						compile: 1,
-						key: apiKey,
+						key: generateKey(),
 						channel: e.to,
 						from: e.from.nick,
 						id: 0,
@@ -351,15 +372,15 @@ const mod = {
 						log: JSON.stringify(e.log)
 					};
 					
-					let r = request.post({url: uri, formData: formData}, function (error, response, body) {
+					var r = request.post({url: uri, formData: formData}, function (error, response, body) {
 
 						if (error || response.statusCode != 200) {
 							e.reply("Command failed testing");
 						}
 					});
-					let out = 0;
+					var out = 0;
 					 r.on('response',function(response){
-						 let a = 0;
+						 var a = 0;
 						 response.on('data', function(body) {
 							 console.log(body.toString());
 							 body = body.toString();
@@ -375,15 +396,15 @@ const mod = {
 								const parts = body.replace(/\r/g, "").split("\n");
 								console.log(parts.length);
 								for(let x in parts){
+                                    if(parts[x].length < 1) continue;
 									parts[x] = parts[x].replace("_evt", "");
-									parts[x] = parts[x].replace(/duckgoose/ig, "Time-Warp");
 									if(isBad(parts[x])){
 										e.reply("The output contains banned words");
 									}else if(parts[x].indexOf("V523n") > -1 || parts[x].indexOf("_evt") > -1){
 										e.reply("null");
 										return;
 									}else if(parts[x].substr(0,3) == "@_+"){
-										let cmd = parts[x].substr(3).split("=");
+										var cmd = parts[x].substr(3).split("=");
 										switch(cmd[0]){
 											case "kick":
 												if(perms[coms[i].command]!=undefined && perms[coms[i].command].kick!=undefined){
@@ -402,7 +423,7 @@ const mod = {
 
 													
 												}else{
-													e.reply("Error: kick() Permission denied");
+													e.reply("Error: voice() Permission denied");
 												}
 												break;
 										}
@@ -412,7 +433,7 @@ const mod = {
 									out++;
 									rtimer = rtimer * 2;
 									if(x == 3) break;
-									if(out>5) r.abort();
+									if(out>3) r.abort();
 								}
 								
 								return;
@@ -427,8 +448,8 @@ const mod = {
 }
 
 function decodeEntities(encodedString) {
-    let translate_re = /&(nbsp|amp|quot|lt|gt);/g;
-    let translate = {
+    var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
+    var translate = {
         "nbsp":" ",
         "amp" : "&",
         "quot": "\"",
@@ -438,7 +459,7 @@ function decodeEntities(encodedString) {
     return encodedString.replace(translate_re, function(match, entity) {
         return translate[entity];
     }).replace(/&#(\d+);/gi, function(match, numStr) {
-        let num = parseInt(numStr, 10);
+        var num = parseInt(numStr, 10);
         return String.fromCharCode(num);
     });
 }
@@ -456,8 +477,8 @@ function isBad($t){
 	if($t.indexOf("。") > -1) return true;
 	if($t.indexOf("゜") > -1) return true;
 	$t = $t.replace(/[^\x20-\x7E]/g, "");
-	$bad = "quack quack,flap,fag,nigg,pussy,rimjab,scrotum,shit,slut,twat,whore,vagina".split(",");
-	for(let i in $bad){
+	$bad = "quack quack,dcc,flap,fag,nigg,rimjab,scrotum,shit,slut,twat,whore".split(",");
+	for(var i in $bad){
 		if($t.toLowerCase().indexOf($bad[i])>-1) return true;
 	}
 	return false;

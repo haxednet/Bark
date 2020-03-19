@@ -21,12 +21,19 @@ const mod = {
 					let count = 0;
 					if(res.status == "OK"){
 						const parts = res.output.replace(/\r/g, "").split("\n");
-						for(let i in parts){
-							if(parts[i].length > 0 && count < 3){
-								count++;
-								e.reply(parts[i]);
-							}
-						}
+                        
+                        if(res.output.indexOf("/tmp/pyrunner")>-1){
+                            e.reply(decodeHTMLEntities(res.output.replace(/\r|\n/g, ">>").substr(0,1024) + "..."));
+                        }else{
+                            for(let i in parts){
+                                if(parts[i].length > 0 && count < 3){
+                                    count++;
+                                    if(parts[i].length > 1000) return e.reply("that output is too damn big to print!!");
+                                    if(parts[i].toLowerCase().indexOf("dcc")>-1) return e.reply("Nope");
+                                    e.reply(decodeHTMLEntities(parts[i]));
+                                }
+                            }
+                        }
 					}
 					
 			}); 
@@ -45,6 +52,26 @@ function base64_encode(e){
 function base64_decode(e){
 	return Buffer.from(e, 'base64').toString();
 	
+}
+
+function decodeHTMLEntities(text) {
+    var entities = [
+        ['amp', '&'],
+        ['apos', '\''],
+        ['#x27', '\''],
+        ['#x2F', '/'],
+        ['#39', '\''],
+        ['#47', '/'],
+        ['lt', '<'],
+        ['gt', '>'],
+        ['nbsp', ' '],
+        ['quot', '"']
+    ];
+
+    for (var i = 0, max = entities.length; i < max; ++i) 
+        text = text.replace(new RegExp('&'+entities[i][0]+';', 'g'), entities[i][1]);
+
+    return text;
 }
 
 module.exports = mod;

@@ -22,6 +22,7 @@ const mod = {
 		}
 		
 		if(vid){
+            console.log("Valid video found, id=" + vid);
 			request.get('https://www.googleapis.com/youtube/v3/videos?key=AIzaSyCrTbpjMiMM7Edsp-ewTu--d7dBkCDx_xE&part=snippet&id=' + vid, function (error, response, body) {
 				if (!error && response.statusCode == 200) {
 					let j = JSON.parse(body);

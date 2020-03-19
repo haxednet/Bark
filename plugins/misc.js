@@ -10,8 +10,8 @@ const mod = {
 				request.get('https://api.haxed.net/answers/?key=dfuigh84hg&q=' + local, function (error, response, body) {
 					if (!error && response.statusCode == 200) {
 						const bx = body.split("<br>");
-						e.reply(bx[0]);
-						e.reply(bx[1]);
+						e.reply(bx[0].replace(/\r|\n/g, " "));
+						e.reply(bx[1].replace(/\r|\n/g, " "));
 					}
 				});
 			}

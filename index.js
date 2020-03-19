@@ -1,19 +1,18 @@
 const tls = require('tls');
 const fs = require('fs');
 const irc = require('./irc.js');
-const config = require('./config.json');
 
 const password = fs.readFileSync('password.txt', 'utf8');
+let ignoreList = [];
 
-let ignoreList = [["*!*@unaffiliated/rtqp", 0, 0]];
-
-let commandPrefix = config.commandPrefix;
+let commandPrefix = ".";
 
 let lastCommand = Date.now();
 let slowDownState = 0;
 
-let admins = config.admins;
-let trusted = config.trusted;
+let botMaster = "burdirc/developer/duckgoose";
+let admins = ["burdirc/developer/duckgoose", "gateway/tor-sasl/hoffman", "freenode/father-christmas/kindone"];
+let trusted = ["gateway/tor-sasl/apt-get-schwifty", "gateway/vpn/privateinternetaccess/sprinkls"];
 
 let lastTime = Date.now();
 let mods = [];
@@ -40,25 +39,34 @@ newBot();
 
 function newBot(){
 	const bot = new irc({
-		host: config.host,
-		port: config.port,
-		ssl: config.ssl,
-		nick: config.nick,
+		host: "irc.freenode.org",
+		port: 6697,
+		ssl: true,
+		nick: "Bark",
 		ident: "Grr",
 		realNme: "Woof",
 		auth: {type: "sasl_plain", user: "bark", password: password},
-		channels: config.channels
+		channels: ["##defocus","##barkbarkbark", "##fitness"]
 	});
+    
+    bot.on('close', (e) => {
+        process.exit();
+    });
+    
+    bot.on('error', (e) => {
+        process.exit();
+    });
 
 	bot.on('data', (e) => {
-
-		lastTime = Date.now();
 		
+		if(e.toLowerCase().indexOf("amIalive") > -1){
+			lastTime = Date.now();
+		}
 		
 		for(let i in mods){
 			if(mods[i].mod.onData != undefined) mods[i].mod.onData(e);
 		}
-
+		console.log(e);
 	});
 	
 	bot.on('numeric', (e) => {
@@ -78,6 +86,7 @@ function newBot(){
 		e.args = e.message.split(" ");
 		e.prefix = commandPrefix;
 		e.admin = false;
+		e.botMaster = false;
 		e.trusted = false;
 		
 		if(tinyLog.length > 30) tinyLog.splice(0, 1);
@@ -87,12 +96,19 @@ function newBot(){
 		for(let i in tinyLog){
 			if(tinyLog[i][2] == e.to) e.log.push(tinyLog[i]);
 		}
+		
 		tinyLog.push([Date.now(), e.from.mask, e.to, e.message]);
 		
 		if(admins.includes(e.from.host)) e.admin = true;
 		if(trusted.includes(e.from.host)) e.trusted = true;
+		if(botMaster == e.from.host){
+			e.trusted = true;
+			e.botMaster = true;
+		}
 		
-		if(e.isPM && e.admin == false) return;
+		if(e.isPM){
+            if(e.trusted ==false && e.admin == false) return;
+        }
 		
 		if(e.from.nick == "jenni") return;
 		
@@ -101,8 +117,8 @@ function newBot(){
 		
 		
 		
-		for(let i in ignoreList){
-			let usrR = userAsRegex(ignoreList[i][0]);
+		for(var i in ignoreList){
+			var usrR = userAsRegex(ignoreList[i][0]);
 			if( e.from.mask.match(usrR) && e.admin == false ) return;
 		}
 		
@@ -153,7 +169,7 @@ function newBot(){
 							}
 							e.reply("I couldn't find that host");
 						}else if(e.args[1] == "list"){
-							let hosts = "";
+							var hosts = "";
 							for(let i in ignoreList){
 								hosts = hosts + ignoreList[i][0] + " ";
 							}
@@ -169,6 +185,7 @@ function newBot(){
 					
 						if(e.args[1] == "add"){
 							if(e.args.length != 3) return;
+							if(!e.botMaster) return e.reply("You do not have access this this option");
 							admins.push(e.args[2]);
 							e.reply("added host to admin list");
 						}else if(e.args[1] == "remove"){
@@ -180,7 +197,7 @@ function newBot(){
 								e.reply("host not found in admin list");
 							}
 						}else if(e.args[1] == "list"){
-							let hosts = "";
+							var hosts = "";
 							for(let i in admins){
 								hosts = hosts + admins[i] + " ";
 							}
@@ -365,14 +382,6 @@ function newBot(){
 		if(mods[i].mod.onBot != undefined) mods[i].mod.onBot(cBot);
 	}
 	
-	
-	bot.on("close", function(e){
-		console.log("I died");
-	});
-	
-	bot.on("error", function(e){
-		console.log("I died error");
-	});
 
 	
 }
@@ -395,8 +404,8 @@ setInterval(function(){
 }, 1000);
 
 function userAsRegex( e ){
-	let returnStr = "";
-	for( let i in e ) {
+	var returnStr = "";
+	for( var i in e ) {
 		returnStr += e[i].replace( /[^a-zA-Z\d\s\*:]/, "\\" + e[i] );
 	}
 	returnStr = returnStr.replace( /\s/g, "\\s" );
@@ -404,12 +413,7 @@ function userAsRegex( e ){
 	return new RegExp(returnStr, "ig");
 }
 
-
-setInterval(function(){
-	/* timer to make sure the bot is alive */
-	cBot.sendData("PING :amIalive");
-	if((Date.now() - lastTime) > 60000){
-		process.exit();
-	}
-}, 20000);
+setTimeout(function(){
+    cBot.sendData("cs op ##defocus");
+}, 25000);
 

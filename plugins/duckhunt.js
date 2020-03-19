@@ -92,19 +92,29 @@ const mod = {
 		}},
 		
 		{command: "xfer", hidden: true, usage: "shh", callback: (e)=>{
-			
 			let bits = e.message.toLowerCase().substr(6).split(" ");
+            if(bits.length < 4) return e.reply("Invalid arguments. Example: xfer friends fromNick toNick 8");
+            if(isNaN(parseInt(bits[3]))) return e.reply("NaN");
 			// .xfer friends hoffman duckgoose 20
 			if(e.admin){
+                bits[2] = linked(bits[2]);
+                bits[1] = linked(bits[1]);
+                if(stats[bits[2]] == undefined) return e.reply( bits[2] + " has no stats");
+                if(stats[bits[1]] == undefined) return e.reply( bits[1] + " has no stats");
 				var s1 = stats[bits[1]];
 				var s2 = stats[bits[2]];
 				var amount = parseInt(bits[3]);
+                
 				if(bits[0] == "friends"){
+                    if(s1.friends < amount) return e.reply("Not enough friends for that");
 					e.reply("gave " + amount + " of " + bits[1] + "'s ducks to " + bits[2] );
+                    
 					stats[bits[1]].friends = s1.friends - amount;
 					stats[bits[2]].friends = s2.friends + amount;
 				}else if(bits[0] == "kills"){
+                    if(s1.kills < amount) return e.reply("Not enough kills for that");
 					e.reply("gave " + amount + " of " + bits[1] + "'s kills to " + bits[2] );
+
 					stats[bits[1]].kills = s1.kills - amount;
 					stats[bits[2]].kills = s2.kills + amount;
 				}else{
@@ -169,7 +179,7 @@ const mod = {
 				clearTimeout(whoTimer);
 				whoTimer = setTimeout(function(){
 					links = [];
-					//ircBot.sendData("WHO " + chan + " %na");
+					ircBot.sendData("WHO " + chan + " %na");
 				},5000);
 			}
 			if(ds[1] == "KICK"){

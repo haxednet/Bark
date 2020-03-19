@@ -61,11 +61,11 @@ class irc extends EventEmitter {
 		}
 		
 		this.client.on('error', function(data) {
-			myself.emit("error", data);
+			myself.emit("error", {data: data});
 		});
 		
 		this.client.on('close', function(data) {
-			myself.emit("closed");
+			myself.emit("close", {data: data});
 		});
 		
 		this.client.on('data', function(data) {
@@ -249,7 +249,8 @@ class irc extends EventEmitter {
 		}
 		
 		function sendReply(channel, type, message, ms){
-			if(channel.substr(0,1)=="#") channel = parseUser(channel).nick;
+            channel = channel.replace(":","");
+			if(channel.substr(0,1)!="#") channel = parseUser(channel).nick;
 			ms.sendData(type + " " + channel + " :" + message);
 		}
 		
@@ -317,7 +318,7 @@ class irc extends EventEmitter {
 		for(var i in this.channels){
 			if(i == channel.toLowerCase()) return this.channels[i];
 		}
-		return false;
+		return {users:[]};
 	}
 	
 	test(){
