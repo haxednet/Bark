@@ -1,1 +1,1 @@
-while true; do node index; sleep 30; done
+while true; do node index c > out.txt; sleep 30; done

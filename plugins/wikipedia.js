@@ -1,18 +1,18 @@
 ﻿const request = require('request');
 
 const mod = {
-	hook_commands: [
+	commands: [
 		{command: "wikipedia", callback: (e)=>{
 			let input = e.message.substr(11);
-			request('https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=' + input, (error, response, body)=>{
+			request('https://en.wikipedia.org/api/rest_v1/page/summary/' + input + "?redirect=false", (error, response, body)=>{
 				if(error){
 					e.reply("Error :(");
 				}else{
 					const J = JSON.parse(body);
-					if(J[1].length == 0){
-						e.reply("Nothing found for " + J[0]);
+					if(J.type.indexOf("/errors/")>-1){
+						e.reply("Nothing found for " + J.title);
 					}else{
-						e.reply("" + J[1][0] + ": " + J[2][0]);
+						e.reply("" + J.title + ": " + J.extract);
 					}
 				}
 			});

@@ -1,12 +1,18 @@
 {
-	"host": "irc.freenode.org",
-	"port": 6697,
-	"ssl": true,
-	"nick": "BarkTest",
-	"channels": ["##barkbarkbark"],
-	
-	"admins": ["burdirc/developer/duckgoose", "gateway/tor-sasl/hoffman", "freenode/father-christmas/kindone"],
-	"trusted": ["gateway/tor-sasl/apt-get-schwifty", "gateway/vpn/privateinternetaccess/sprinkls"],
-	
-	"commandPrefix": ","
+    "host": "irc.freenode.org",
+    "port": 6697,
+    "ssl": true,
+    "nick": "Bark_",
+    "auth": {"type": "sasl_plain", "user": "bark", "password": "hunter2"},
+    "channels": ["##barkbarkbark"],
+    
+    "##barkbarkbark": {
+        "admins": ["*!*@burdirc/developer/duckgoose"],
+        "disallowedCommands": ["test"]
+    },
+    
+    "botMasters": ["*!*@burdirc/developer/duckgoose"],
+    
+    "commandPrefix": "!"
+        
 }

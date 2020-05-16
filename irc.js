@@ -16,18 +16,15 @@ class irc extends EventEmitter {
 		e.auth = e.auth || {type:"none"};
 		e.realName = e.realName || "simple-irc bot";
 		e.ssl = e.ssl || false;
-		this.nick = e.nick;
 		this.config = e;
 		this.makeSocket();
 		this.dataCache = "";
 		this.ISUPPORT = ["CHANTYPES=#"];
-		this.channels = {};
-		this.cache = "";
     }
 	
 	makeSocket(){
 		this.client = new net.Socket();
-		this.client.setEncoding("UTF-8");
+		
 		const myself = this;
 		
 		/*
@@ -48,7 +45,6 @@ class irc extends EventEmitter {
 			this.client.connect(this.config.port, this.config.host, function() {
 				connectionEst();
 			});
-			
 		}
 		
 		function connectionEst(){
@@ -61,24 +57,22 @@ class irc extends EventEmitter {
 		}
 		
 		this.client.on('error', function(data) {
-			myself.emit("error", {data: data});
+			
 		});
 		
 		this.client.on('close', function(data) {
-			myself.emit("close", {data: data});
+			
 		});
 		
 		this.client.on('data', function(data) {
 			data = data.toString();
-
 			/*
 			append data to a cache until we receive \n at the end of a buffer
 			to ensure we get all of the packet and not just a chunk.
 			Make sure the buffer isn't too big. we don't want memory problems.
 			*/
-			
-			myself.dataCache += data.replace(/\r/g, "\n");
-			if(myself.dataCache.lengh > 500000 || myself.dataCache.slice(-1) == "\n"){
+			myself.dataCache += data.replace(/\r/g, "");
+			if(myself.dataCache.lengh > 500000 || myself.dataCache.slice(-1 == "\n")){
 				/*
 				we may have multiple packets in the cache, so lets split the cache by \n
 				and process each item
@@ -96,6 +90,7 @@ class irc extends EventEmitter {
 	}
 	
 	processData(e){
+		e = e.replace(/\n/g, "");
 		if(e.length < 2) return; /* nothing useful is this small */
 		this.emit("data", e);
 		if(e.substr(0,1) != ":") e = ":null " + e;
@@ -104,9 +99,9 @@ class irc extends EventEmitter {
 		const UB = e.toUpperCase().split(" ");
 		const myself = this;
 		
-		let usr = {};
 		let cMsg = bits[bits.length - 1];
 		if(e.indexOf(" :") > -1) cMsg = e.substr(e.indexOf(" :") + 2);
+		
 		
 		if(isNaN(bits[1]) == false){
 			this.emit("numeric", {number: parseInt(bits[1]), data: e});
@@ -114,46 +109,12 @@ class irc extends EventEmitter {
 				case E.RPL_WELCOME:
 					this.emit("connected");
 					for(let i in this.config.channels){
-						setTimeout(function(){
-							myself.sendData("JOIN " + myself.config.channels[i] );
-						}, 2000 * i);
+						this.sendData("JOIN " + this.config.channels[i] );
 					}
 					break;
-					
 				case E.RPL_SASL_AUTH:
+				case E.ERR_SASL_AUTH:
 					this.sendData("CAP END");
-					break;
-					
-				case E.RPL_ENDOFNAMES:
-					/*
-						The list of nicks has completed so we can parse them now
-					
-					console.log(bits[3] + " - END_NAMES");
-					this.channels[bits[3].toLowerCase()] = {users: []};
-					this.cache = this.cache.replace(/\@|\+/g, "");
-					let names = this.cache.substr(1).split(" ");
-					for(let x in names){
-						
-						if( !this.channels[bits[3].toLowerCase()].users.includes(names[x]) ){
-							this.channels[bits[3].toLowerCase()].users.push(names[x]);
-						}
-					}
-					console.log("added " + names.length + " names to " + bits[3].toLowerCase());
-					this.cache = "";
-					*/
-					break;
-					
-				case E.RPL_NAMREPLY:
-					/*
-						large channels send users in multiple packets, so we need to cache them
-						until we get RPL_ENDOFNAMES
-					*/
-					cMsg = cMsg.replace(/\@|\+/g,"");
-					console.log(cMsg);
-					if(this.channels[bits[4].toLowerCase()] == undefined) this.channels[bits[4].toLowerCase()] = {users: []};
-					this.channels[bits[4].toLowerCase()].users = this.channels[bits[4].toLowerCase()].users.concat(cMsg.split(" "));
-					console.log(bits[4] + this.channels[bits[4].toLowerCase()].users.length + " - NAMES");
-					//this.cache += " " + cMsg;
 					break;
 			}
 		}else{
@@ -182,17 +143,7 @@ class irc extends EventEmitter {
 						this.sendData("AUTHENTICATE " + btoa(this.config.auth.user + String.fromCharCode(0) + this.config.auth.user + String.fromCharCode(0) + this.config.auth.password));
 					}
 					break;
-				case "NICK":
-					usr = parseUser(bits[0]);0
-					if(this.nick == usr.nick) this.nick = cMsg;
-					for(let i in this.channels){
-						for(let a in this.channels[i].users){
-							if(this.channels[i].users[a].toLowerCase() == usr.nick.toLowerCase()){
-								this.channels[i].users[a] = cMsg;
-							}
-						}
-					}
-					break;
+
 				case "NOTICE":
 					if(this.isChannel(bits[2])){
 						this.emit("notice", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: false, reply: (e)=>{
@@ -207,7 +158,7 @@ class irc extends EventEmitter {
 					
 				case "PRIVMSG":
 					if(this.isChannel(bits[2])){
-						this.emit("privmsg", {botNick: myself.nick, from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: false, reply: (e)=>{
+						this.emit("privmsg", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: false, reply: (e)=>{
 							sendReply(bits[2], "PRIVMSG", e, myself);
 						}});
 					}else{
@@ -218,39 +169,22 @@ class irc extends EventEmitter {
 					break;
 					
 				case "JOIN":
-					usr = parseUser(bits[0]);
-					if(usr.nick.toLowerCase() == this.nick.toLowerCase()){
-						this.channels[bits[2].toLowerCase()] = {users: []};					
-					}else{
-						if(this.channels[bits[2].toLowerCase()].users.includes(usr.nick) == false) this.channels[bits[2].toLowerCase()].users.push(usr.nick);
-					}
-					this.emit("join", {user: usr, channel: bits[2]});
+					this.emit("join", {user: parseUser(bits[0]), channel: bits[2]});
 					break;
 					
 				case "PART":
-					usr = parseUser(bits[0]);
-					this.removeChannelUser(usr.nick, bits[2]);
-					this.emit("part", {user: usr, channel: bits[2], message: cMsg});
+					this.emit("part", {user: parseUser(bits[0]), channel: bits[2], message: cMsg});
 					break;
 					
 				case "QUIT":
-					usr = parseUser(bits[0]);
-					this.removeChannelUser(usr.nick, "*");
-					this.emit("quit", {user: usr, message: cMsg});
-					break;
-				
-				case "KICK":
-					usr = parseUser(bits[0]);
-					this.removeChannelUser(bits[3], bits[2]);
-					this.emit("kick", {kicker: usr.nick, kicked: bits[3], channel: bits[2], message: cMsg});
+					this.emit("quit", {user: parseUser(bits[0]), message: cMsg});
 					break;
 					
 			}
 		}
 		
 		function sendReply(channel, type, message, ms){
-            channel = channel.replace(":","");
-			if(channel.substr(0,1)!="#") channel = parseUser(channel).nick;
+			if(channel.substr(0,1)=="#") channel = parseUser(channel).nick;
 			ms.sendData(type + " " + channel + " :" + message);
 		}
 		
@@ -297,28 +231,6 @@ class irc extends EventEmitter {
 		if(chanTypes.includes(e.substr(0,1))) return true;
 		
 		return false;
-	}
-	
-	removeChannelUser(user, channel){
-		for(let i in this.channels){
-			if(i == channel.toLowerCase() || channel == "*"){
-				for(let a in this.channels[i].users){
-					if(this.channels[i].users[a].toLowerCase() == user.toLowerCase()){
-						this.channels[i].users.splice(a, 1);
-						console.log("removed " + this.channels[i].users[a] + " from ");
-						break;
-					}
-				}
-			}
-		}
-		return false;
-	}
-	
-	getChannelObject(channel){
-		for(var i in this.channels){
-			if(i == channel.toLowerCase()) return this.channels[i];
-		}
-		return {users:[]};
 	}
 	
 	test(){
