@@ -1,6 +1,11 @@
 /*
     The only reason this is named "zzzccom.js" is so that it will be loaded last.
     Don't judge me!
+    -
+    This plugin allows users to make custom (limited) ccoms using php. in order for this to work you
+    need to upload the php script at /plugins/data/ccom.php to a server with php and PHPSandBox (https://github.com/fieryprophet/php-sandbox)
+    
+    After you do this change the uri veriable to point to your script
 */
 
 const fs = require('fs');

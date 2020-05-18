@@ -153,7 +153,6 @@ setInterval(function(){
         /* if hunt is enabled and the last message was less than 50 minutes ago... */
         if(channelSettings[i].enabled && (Date.now() - channelSettings[i].lastMessage) < 3000000){
             let rn = rand(1,6);
-            console.log("ticked, number was " + rn);
             if(rn == 5 || channelSettings[i].active){
                 /* everything is good, lets generate duck */
                 channelSettings[i].active = true;

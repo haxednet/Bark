@@ -199,16 +199,26 @@ function newBot(){
                     break;
                 case "help":
                     if(e.bits.length > 1){
-                        for(let i in plugins){
-                            for(let j in plugins[i].plugin.commands){
-                                if(plugins[i].plugin.commands[j].command == e.bits[1].toLowerCase()){
-                                    return e.reply(plugins[i].plugin.commands[j].usage.replace(/\$/g, config.commandPrefix));
+                        if(e.bits[1] == "list"){
+                            let commands = "";
+                            for(let i in plugins){
+                                for(let j in plugins[i].plugin.commands){
+                                    commands += " " + config.commandPrefix + plugins[i].plugin.commands[j].command;
+                                }
+                            }
+                            return e.reply("List of commands:" + commands);
+                        }else{
+                            for(let i in plugins){
+                                for(let j in plugins[i].plugin.commands){
+                                    if(plugins[i].plugin.commands[j].command == e.bits[1].toLowerCase()){
+                                        return e.reply(plugins[i].plugin.commands[j].usage.replace(/\$/g, config.commandPrefix));
+                                    }
                                 }
                             }
                         }
                         return e.reply("Command " + e.bits[1] + " was not found");
                     }else{
-                        return e.reply("For help with a command type " + config.commandPrefix + "help command");
+                        return e.reply("For help with a command type " + config.commandPrefix + "help command, or type " + config.commandPrefix + "help list to list commands");
                     }
                     break;
                     

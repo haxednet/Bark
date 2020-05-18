@@ -42,7 +42,7 @@ const mod = {
 	commands: [
 		{command: "flip", usage: "flips your text over. Usage: $flip hello world", callback: (e)=>{
 			let input = e.message.substr(6).toLowerCase().split("");
-			if(e.args.length > 1){
+			if(e.bits.length > 1){
 				let flip = flippers[rand(0,flippers.length-1)];
 				let fText = "";
 				for(let a in input){

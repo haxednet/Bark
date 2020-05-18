@@ -11,7 +11,6 @@ const plugin = {
 		for(let i in e.bits){
             const urls = e.bits[i].match(urlR);
             const yt = youtube(e.bits[i]);
-            console.log(yt);
             if(yt){
 			request.get('https://www.googleapis.com/youtube/v3/videos?key=AIzaSyCrTbpjMiMM7Edsp-ewTu--d7dBkCDx_xE&part=snippet&id=' + yt, function (error, response, body) {
 				if (!error && response.statusCode == 200) {
