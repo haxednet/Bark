@@ -2,3 +2,4 @@ password.txt
 *.pem
 node_modules/
 plugins/data/*.json
+package-lock.json
