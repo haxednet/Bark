@@ -20,6 +20,7 @@ function loadMods(){
 			delete require.cache[require.resolve("./plugins/" + file)];
 			const mod = require("./plugins/" + file);
 			plugins.push({name: file, plugin: mod});
+            if(mod.init != undefined) mod.init();
 		}
 	});
 }

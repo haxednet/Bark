@@ -11,8 +11,8 @@
 const fs = require('fs');
 const request = require('request');
 const querystring = require("querystring");
-const coms = require("./data/ccom.json");
-const maps = require("./data/maps.json");
+const coms = [];
+const maps = {};
 
 /* server where php script is hosted */
 const uri = "http://96.92.220.85:2082/xxx.php";
@@ -31,6 +31,12 @@ let perms = {
 };
 
 const mod = {
+    init: ()=>{
+        if(!fs.existsSync("./plugins/data/ccom.json")) fs.writeFileSync("./plugins/data/ccom.json", "[]", 'utf8');
+        if(!fs.existsSync("./plugins/data/maps.json")) fs.writeFileSync("./plugins/data/maps.json", "{}", 'utf8');
+        injectObject("ccom.json", coms);
+        injectObject("maps.json", maps);
+    },
     bot: null,
     commands:[
         {command: "ccom", usage: "nothing here yet", enabled: true, hidden: false, callback: (e)=>{
@@ -156,5 +162,13 @@ function saveCcom(){
     fs.writeFileSync('./plugins/data/ccom.json', JSON.stringify(coms, null, 4), 'utf8');
     fs.writeFileSync('./plugins/data/maps.json', JSON.stringify(maps, null, 4), 'utf8');
 }
+
+function injectObject(a, b){
+    const tStat = require("./data/" + a);
+    for(let i in tStat){
+        b[i] = tStat[i];
+    }
+}
+
 
 module.exports= mod;

@@ -1,16 +1,9 @@
 ﻿const fs = require('fs');
-const stats = require("./data/duckhunt.stats.json");
+const stats = {};
 const duckMessages = ["・ ​ ゜゜・。。・゜゜\_•< QWACK​!","・ ​ ゜゜・。。・゜゜\_0​< QUACK​!","・゜゜ ​ ・。。・゜゜\_o​< Q​UACK!","・゜゜・。 ​ 。・゜゜\_ö<​ FLAP FLAP​!","・゜ ​ ゜・。。・゜゜\​_ó< FLAP ​FLAP!"];
 const channelSettings = {
     "##barkbarkbark": {
-        enabled: true,
-        lastDuck: 0,
-        active: false,
-        lastMessage: 0,
-        lastBribe: 0
-    },
-    "##defocus": {
-        enabled: true,
+        enabled: false,
         lastDuck: 0,
         active: false,
         lastMessage: 0,
@@ -19,6 +12,11 @@ const channelSettings = {
 }
 
 const mod = {
+    init: ()=>{
+        const fn = "duckhunt.stats.json";
+        if(!fs.existsSync("./plugins/data/" + fn)) fs.writeFileSync("./plugins/data/" + fn, "{}", 'utf8');
+        injectObject("duckhunt.stats.json", stats);
+    },
     bot: null,
 	commands: [
 		{command: "bang", enabled: true, hidden: false, usage: "$bang -- shoots a duck", callback: (e)=>{bang(e);}},
@@ -167,6 +165,13 @@ setInterval(function(){
 
 function rand(min, max) {
 	return Math.floor(min + Math.random()*(max + 1 - min))
+}
+
+function injectObject(a, b){
+    const tStat = require("./data/" + a);
+    for(let i in tStat){
+        b[i] = tStat[i];
+    }
 }
 
 module.exports = mod;

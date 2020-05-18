@@ -27,14 +27,6 @@ const mod = {
 				console.log(err);
 				e.reply("D: There was an error with your regex syntax!");
 			}
-		}else{
-			if(e.message.indexOf(".log")>-1) return;
-			cache.push([e.from.nick,e.message,Date.now()]);
-			if(cache > 200) cache.splice(0,1);
-			if((lastSave + 35266) < Date.now()){
-				lastSave = Date.now();
-				fs.writeFileSync('./plugins/data/log.json', JSON.stringify(cache), 'utf8');
-			}
 		}
 	}
 }
