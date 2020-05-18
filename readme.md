@@ -4,7 +4,7 @@
 
 
 ## Off-topic bot
-This bot id designed to be for entertainment and not channel adminitration, although it can be used for both. Some plugins depend on custom APIs, which you may use but not abuse.
+This bot is designed to be for entertainment and not channel adminitration, although it can be used for both. Some plugins depend on custom APIs, which you may use but not abuse.
 
 ## Dependencies
 -   request, for interacting with online APIs
