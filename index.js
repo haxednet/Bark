@@ -9,6 +9,7 @@ let ircBot = null;
 let whoIndex = 0; /* the channel index we're sending a who poll to */
 let lastWho = Date.now();
 
+
 console.log("           __\r\n      (___()'`;   BARK!\r\n      /,    /`\r\n      \\\"--\\");
 
 function loadMods(){
@@ -25,6 +26,15 @@ function loadMods(){
 
 
 function newBot(){
+    const tmpChans = [];
+    for(let c in config){
+        if(c.substr(0,1) == "#"){
+            tmpChans.push(c);
+        }
+    }
+    
+    config.channels = tmpChans;
+    
 	const bot = new irc( config );
 
 	bot.on('data', (e) => {
@@ -47,6 +57,9 @@ function newBot(){
         whoCache[e.user.nick.toLowerCase()] = e.user.nick.toLowerCase();
         if(Date.now() - lastWho > 30000) bot.sendData("WHO " + e.channel + " %na");
         lastWho = Date.now();
+        if(e.user.nick.toLowerCase() == config.nick.toLowerCase()){
+            console.log("Joined " + e.channel);
+        }
         for(let i in plugins){
             try{
                 if(plugins[i].plugin.onJoin != undefined) plugins[i].plugin.onJoin(e);

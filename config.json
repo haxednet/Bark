@@ -4,14 +4,8 @@
     "ssl": true,
     "nick": "Bark_",
     "auth": {"type": "sasl_plain", "user": "bark", "password": "hunter2"},
-    "channels": ["##barkbarkbark"],
     
     "##barkbarkbark": {
-        "admins": ["*!*@burdirc/developer/duckgoose"],
-        "disallowedCommands": [],
-        "autoRejoin": true
-    },    
-    "##defocus": {
         "admins": ["*!*@burdirc/developer/duckgoose"],
         "disallowedCommands": [],
         "autoRejoin": true

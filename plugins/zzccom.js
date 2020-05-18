@@ -1,3 +1,8 @@
+/*
+    The only reason this is named "zzzccom.js" is so that it will be loaded last.
+    Don't judge me!
+*/
+
 const fs = require('fs');
 const request = require('request');
 const querystring = require("querystring");
