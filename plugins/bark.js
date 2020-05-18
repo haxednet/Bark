@@ -11,7 +11,7 @@ const plugin = {
 		{command: "bark", hidden: false, enabled: true, usage: "$bark [message] -- barks your message out loud", callback: (e)=>{
 			var message = e.message.substr(6);
 			if(Date.now()-lastSend<5000){
-				e.reply("No thanks!");
+				e.reply("Give it a rest!");
 			}else{
 				lastSend = Date.now();
 				for(var i in bark){
