@@ -145,6 +145,7 @@ const mod = {
 				e.bits[0] = e.config.commandPrefix + maps[e.bits[0].substr(1).toLowerCase()];
                 e.command = maps[e.bits[0].substr(1).toLowerCase()];
 			}
+            let replyDelay = 1;
             for(let i in coms){
                 if(coms[i].command.toLowerCase() == e.bits[0].substr(1).toLowerCase()){
                     const formData = {
@@ -183,7 +184,11 @@ const mod = {
                                         return e.reply("Error: attempted to use voice() without permission");
                                     }
                                 }else{
-                                    e.reply(parts[x]);
+                                    setTimeout(function(){
+                                        e.reply(parts[x]);
+                                    },replyDelay);
+                                    replyDelay += 1000;
+                                    
                                 }
                                 if(x>3) break;
                             }

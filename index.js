@@ -141,7 +141,7 @@ function newBot(){
 	});
 	
 	bot.on('privmsg', (e) => {
-        if(e.message.length < 4) return;
+        if(e.message.length < 2) return;
         e.message = e.message.replace(/\s\s/g, " ");
         if(e.message.slice(-1) == " ") e.message = e.message.slice(0,-1);
         e.bits = e.message.split(" ");
@@ -204,7 +204,7 @@ function newBot(){
                     
                     break;
                 
-                case "load":
+                case "pload":
                     if(!isAdmin(e)) return e.reply("You do not have access to this command");
                     if(e.bits.length > 1){
                         for(let i in plugins){
@@ -219,7 +219,7 @@ function newBot(){
                         if(mod.init != undefined) mod.init();
                         return e.reply("Plugin " + e.bits[1] + " was loaded");
                     }else{
-                        return e.reply("To load a plugin type " + config.commandPrefix + "load plugin.js");
+                        return e.reply("To load a plugin type " + config.commandPrefix + "pload plugin.js");
                     }
                     break;
                     
@@ -316,7 +316,7 @@ function newBot(){
                     break;
             }
             
-            if(Date.now() - rateLimit < 4000) return;
+            if(Date.now() - rateLimit < 2000) return;
             rateLimit = Date.now();
             
             /* plugin commands */
