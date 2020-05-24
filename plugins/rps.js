@@ -12,6 +12,8 @@ const choices = ["r","p","s"];
 
 let channel = "##defocus";
 
+let bot = "bark";
+
 let gameTimer = 0;
 
 const mod = {
@@ -19,14 +21,15 @@ const mod = {
 	commands: [
 		{command: "rps", enabled: true, hidden: false, usage: "Starts a game of rock–paper–scissors. Example usage: $rps duckgoose", callback: (e)=>{
             channel = e.to;
-            if(e.from.nick.toLowerCase() == e.bits[1].toLowerCase() || e.bits[1].toLowerCase() == "bark") e.bits[1] = "bark";
+            bot = e.botNick;
 			if(e.bits.length > 1){
+                if(e.from.nick.toLowerCase() == e.bits[1].toLowerCase() || e.bits[1].toLowerCase() == e.botNick.toLowerCase()) e.bits[1] = e.botNick.toLowerCase();
 				if(game.player1.nick != "") return e.reply("Game already in progress...");
 				e.reply( e.bits[1] + ": " + e.from.nick + " has challenged you to a game of rock–paper–scissors!");
-				e.reply( e.bits[1] + " & " + e.from.nick + ": Make your choice by sending /notice bark [r|p|s]");
+				e.reply( e.bits[1] + " & " + e.from.nick + ": Make your choice by sending /notice " + e.botNick + " [r|p|s]");
 				game.player1.nick = e.from.nick.toLowerCase();
 				game.player2.nick = e.bits[1].toLowerCase();
-                if(e.bits[1] == "bark") game.player2.choice = choices[rand(0,2)];
+                if(e.bits[1] == e.botNick) game.player2.choice = choices[rand(0,2)];
 				gameTimer = setTimeout(function(){
 					if(game.player1.choice == "" || game.player2.choice == ""){
 						mod.bot.sendData("PRIVMSG " + channel + " :Waited 60 seconds for selection. Game ended.");
@@ -74,7 +77,7 @@ function checkForWin(){
 			mod.bot.sendData("PRIVMSG " + channel + " :You've both chosen " + game.choices[p1.choice] + "! Try again");
 			p2.choice = "";
 			p1.choice = "";
-            if(game.player2.nick == "bark") game.player2.choice = choices[rand(0,2)];
+            if(game.player2.nick == bot.toLowerCase()) game.player2.choice = choices[rand(0,2)];
             gameTimer = setTimeout(function(){
                 if(game.player1.choice == "" || game.player2.choice == ""){
                     mod.bot.sendData("PRIVMSG " + channel + " :Waited 60 seconds for selection. Game ended.");

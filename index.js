@@ -1,14 +1,22 @@
 const tls = require('tls');
 const fs = require('fs');
 const irc = require('./irc.js');
-const config = require('./config.json');
-const keys = require('./apiKeys.json');
 const plugins = [];
 const whoCache = {};
 const tinyLog = [];
 let ircBot = null;
 let whoIndex = 0; /* the channel index we're sending a who poll to */
 let lastWho = Date.now();
+let rateLimit = 0;
+
+if( !fs.existsSync("config.json") ) return console.log("ERROR: You must have a config.json file to use this program");
+const config = require('./config.json');
+let keys = {};
+if( !fs.existsSync("apiKeys.json") ){
+    console.log("WARNING: you do not have an apiKeys.json file. Some commands may not work");
+}else{
+    keys = require('./apiKeys.json');
+}
 
 
 console.log("           __\r\n      (___()'`;   BARK!\r\n      /,    /`\r\n      \\\"--\\");
@@ -26,6 +34,16 @@ function loadMods(){
 	});
 }
 
+function isCommand(e){
+    for(let i in plugins){
+        for(let j in plugins[i].plugin.commands){
+            if(plugins[i].plugin.commands[j].command == e){
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 function newBot(){
     const tmpChans = [];
@@ -55,18 +73,25 @@ function newBot(){
 	});
     
 	bot.on('join', (e) => {
+        if(config[e.channel.toLowerCase()] == undefined){
+            config[e.channel.toLowerCase()] = {};
+            config[e.channel.toLowerCase()].admins = [];
+            config[e.channel.toLowerCase()].disallowedCommands = [];
+        }    
         e.botNick = config.nick;
+        e.config = config;
         whoCache[e.user.nick.toLowerCase()] = e.user.nick.toLowerCase();
         if(Date.now() - lastWho > 30000) bot.sendData("WHO " + e.channel + " %na");
         lastWho = Date.now();
         if(e.user.nick.toLowerCase() == config.nick.toLowerCase()){
             console.log("Joined " + e.channel);
+            bot.sendData("WHO " + e.channel + " %na");
         }
         for(let i in plugins){
             try{
                 if(plugins[i].plugin.onJoin != undefined) plugins[i].plugin.onJoin(e);
             }catch(err){
-                e.reply("Plugin " + plugins[i].name + " has caused an error and will now be unloaded (" + err.message + ")");
+                console.log("Plugin " + plugins[i].name + " has caused an error and will now be unloaded (" + err.message + ")");
                 plugins.splice(i, 1);
                 return;
             }
@@ -78,6 +103,7 @@ function newBot(){
     
 	bot.on('part', (e) => {
         e.botNick = config.nick;
+        e.config = config;
         if(e.user.nick.toLowerCase() == config.nick.toLowerCase()){
             bot.sendData("JOIN " + e.channel);
         }
@@ -94,6 +120,7 @@ function newBot(){
 	});
 	
 	bot.on('numeric', (e) => {
+        e.config = config;
         for(let i in plugins){
             if(plugins[i].plugin.onNumeric != undefined) plugins[i].plugin.onNumeric(e);
         }
@@ -125,7 +152,9 @@ function newBot(){
         e.input = e.message.substr(e.command.length + 2);
         e.username = getUser(e.from.nick); /* username is who they're logged in as, not their nick */
         e.config = config;
-            
+        e.botNick = config.nick;
+        e.whoCache = whoCache;
+        
         if(e.message.substr(0,1) == config.commandPrefix){
             
             /* a tiny log for ccoms to work with */
@@ -138,8 +167,12 @@ function newBot(){
             
             
             /* find settings for the channel. if non are found return */
-            const settings = config[e.to.toLowerCase()];
-            if(settings == undefined) return;
+            let settings = config[e.to.toLowerCase()];
+            if(settings == undefined){
+                settings = {};
+                settings.admins = [];
+                settings.disallowedCommands = [];
+            }
             
             e.admin = isAdmin(e,settings.admins);
             
@@ -147,6 +180,15 @@ function newBot(){
             if(settings.disallowedCommands.includes(e.command)) return;
             
             /* internal commands */
+            if(settings.bannedParams != undefined){
+                for(let i in settings.bannedParams){
+                    if(e.message.toLowerCase().indexOf(settings.bannedParams[i].toLowerCase()) > -1){
+                        return e.reply("Your request contains banned terms and thus can not be processed.");
+                    }
+                    
+                }
+            }
+            
             switch(e.command){
                 
                 case "raw":
@@ -156,6 +198,10 @@ function newBot(){
                     }else{
                         return e.reply("To send raw data to the server type" + config.commandPrefix + "raw data");
                     }
+                    break;
+                    
+                case "config":
+                    
                     break;
                 
                 case "load":
@@ -170,6 +216,7 @@ function newBot(){
                         let mod = require("./plugins/" + e.bits[1]);
                         plugins.push({name: e.bits[1], plugin: mod});
                         mod.bot = bot;
+                        if(mod.init != undefined) mod.init();
                         return e.reply("Plugin " + e.bits[1] + " was loaded");
                     }else{
                         return e.reply("To load a plugin type " + config.commandPrefix + "load plugin.js");
@@ -187,6 +234,7 @@ function newBot(){
                                 let mod = require("./plugins/" + e.bits[1]);
                                 plugins.push({name: e.bits[1], plugin: mod});
                                 mod.bot = bot;
+                                if(mod.init != undefined) mod.init();
                                 return e.reply("Plugin " + e.bits[1] + " has been reloaded");
                             }
                         }
@@ -198,6 +246,9 @@ function newBot(){
                  
                 case "whoami":
                     return e.reply("Your nick is " + e.from.nick + ", but I think you're actually " + e.username);
+                    break;
+                case "whois":
+                    return e.reply("Their nick is " + e.input + ", but I think they're actually " + getUser(e.input));
                     break;
                 case "help":
                     if(e.bits.length > 1){
@@ -265,7 +316,12 @@ function newBot(){
                     break;
             }
             
+            if(Date.now() - rateLimit < 4000) return;
+            rateLimit = Date.now();
+            
             /* plugin commands */
+            
+            if(e.isPM == true) return; /* do not use plugin commands in PMs */
             for(let i in plugins){
                 for(let j in plugins[i].plugin.commands){
                     if(plugins[i].plugin.commands[j].command == e.command){

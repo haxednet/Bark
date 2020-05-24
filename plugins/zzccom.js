@@ -17,7 +17,7 @@ const maps = {};
 /* server where php script is hosted */
 const uri = "http://96.92.220.85:2082/xxx.php";
 
-const helpMsg = "Command failed testing. for help see https://trello.com/b/wz7ipI2G/bark-ccom-programming-examples";
+const helpMsg = "improper command usage. For help see https://trello.com/b/wz7ipI2G/bark-ccom-programming-examples";
 let tinyLog = [];
 
 let perms = {
@@ -72,6 +72,7 @@ const mod = {
                     for(let i in maps){
                         if(i.toLowerCase() == e.bits[2].toLowerCase()){
                             delete maps[i];
+                            saveCcom();
                             return e.reply("Map " + e.bits[2] + " has been removed.");
                         }
                     }
@@ -100,13 +101,50 @@ const mod = {
                         if(coms[i].command.toLowerCase() == e.bits[3].toLowerCase()) ccomFound = true;
                     }
                     maps[e.bits[2].toLowerCase()] = e.bits[3].toLowerCase();
+                    saveCcom();
                     return e.reply(e.bits[2] + " is now mapped to " + e.bits[3]);
+                    break;
+                
+                case "view":
+                    if(e.bits.length < 3) return e.reply(helpMsg);
+   					if(maps[e.bits[2].toLowerCase()] != undefined){
+						return e.reply(e.bits[2] + " is a mapped to " + maps[e.bits[2].toLowerCase()]);
+					}
+                    for(let i in coms){
+                        if(coms[i].command.toLowerCase() == e.bits[2].toLowerCase()){
+                            e.reply(coms[i].code.replace(/\r|\n/g, "\\n").substr(0,1024));
+                            let d = new Date(coms[i].date);
+                            e.reply("Added by " + coms[i].user.mask + " on " + d.toGMTString());
+                            return;
+                        }
+                    }
+                    return e.reply(e.bits[2] + " was not found");
+                    break;
+                
+                case "list":
+                    if(e.bits.length == 2) e.bits[2] = e.from.nick;
+
+                    if(e.bits.length == 3){
+                        let ccomList = "";
+						for(let i in coms){
+							if(coms[i].user.nick.toLowerCase() == e.bits[2].toLowerCase()){
+								ccomList += coms[i].command + " ";
+							}
+						}
+                        e.reply("ccoms added by " + e.bits[2] + ": " + ccomList);
+                    }else{
+                        return e.reply(helpMsg);
+                    }                        
                     break;
             }
         }}
     ],
     onPrivmsg: (e)=>{
         if(e.message.substr(0,1) == e.config.commandPrefix){
+			if(maps[e.bits[0].substr(1).toLowerCase()] != undefined){
+				e.bits[0] = e.config.commandPrefix + maps[e.bits[0].substr(1).toLowerCase()];
+                e.command = maps[e.bits[0].substr(1).toLowerCase()];
+			}
             for(let i in coms){
                 if(coms[i].command.toLowerCase() == e.bits[0].substr(1).toLowerCase()){
                     const formData = {
