@@ -1,6 +1,8 @@
 ﻿const fs = require('fs');
 const stats = {};
+
 const duckMessages = ["・ ​ ゜゜・。。・゜゜\_•< QWACK​!","・ ​ ゜゜・。。・゜゜\_0​< QUACK​!","・゜゜ ​ ・。。・゜゜\_o​< Q​UACK!","・゜゜・。 ​ 。・゜゜\_ö<​ FLAP FLAP​!","・゜ ​ ゜・。。・゜゜\​_ó< FLAP ​FLAP!"];
+
 const channelSettings = {
     "##barkbarkbark": {
         enabled: false,
@@ -65,6 +67,7 @@ function bef(e){
         setFriends(e.username, friends);
         e.reply("(" + e.from.nick + ") You've befriended a duck! Your duck army has grown to " + getFriends(e.username) + " bird(s)");
         channelSettings[e.to].active = false;
+        saveAll();
     }else{
         e.reply("(" + e.from.nick + ") You tried befriending a non-existent duck. That's nice of you!");
     }
@@ -78,6 +81,7 @@ function bang(e){
         setKills(e.username, kills);
         e.reply("(" + e.from.nick + ") You've shot a duck!  You've killed " + getKills(e.username) + " bird(s) so far. Don't let their friends find out!");
         channelSettings[e.to].active = false;
+        saveAll();
     }else{
         e.reply("(" + e.from.nick + ")  There is no duck. What are you shooting at?");
     }
@@ -154,14 +158,17 @@ setInterval(function(){
             if(rn == 5 || channelSettings[i].active){
                 /* everything is good, lets generate duck */
                 channelSettings[i].active = true;
-                //mod.bot.sendData("PRIVMSG " + i + " :" + duckMessages[rand(0, duckMessages.length - 1)]);
-                mod.bot.sendData("PRIVMSG " + i + " :QUACK test QUACK");
+                mod.bot.sendData("PRIVMSG " + i + " :" + duckMessages[rand(0, duckMessages.length - 1)]);
             }
         }else{
             //console.log("no active hunt in " + i + " " + (Date.now() - channelSettings[i].lastMessage));
         }
     }
 }, 1000000);
+
+function saveAll(){
+    fs.writeFileSync('./plugins/data/duckhunt.stats.json', JSON.stringify(stats, null, 4), 'utf8');
+}
 
 function rand(min, max) {
 	return Math.floor(min + Math.random()*(max + 1 - min))

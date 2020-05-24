@@ -5,14 +5,14 @@
     "nick": "Bark_",
     "auth": {"type": "sasl_plain", "user": "bark", "password": "hunter2"},
     
+    "botMasters": ["*!*@burdirc/developer/duckgoose"],
+    
+    "commandPrefix": "!",
+    
     "##barkbarkbark": {
         "admins": ["*!*@burdirc/developer/duckgoose"],
         "disallowedCommands": [],
         "autoRejoin": true
-    },
-    
-    "botMasters": ["*!*@burdirc/developer/duckgoose"],
-    
-    "commandPrefix": "!"
+    }
         
 }

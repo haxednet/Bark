@@ -2,6 +2,7 @@ const tls = require('tls');
 const fs = require('fs');
 const irc = require('./irc.js');
 const config = require('./config.json');
+const keys = require('./apiKeys.json');
 const plugins = [];
 const whoCache = {};
 const tinyLog = [];
@@ -299,6 +300,7 @@ function newBot(){
     
     for(let i in plugins){
        plugins[i].plugin.bot = bot;
+       plugins[i].plugin.keys = keys;
     }
     
     ircBot = bot;

@@ -3,3 +3,4 @@ password.txt
 node_modules/
 plugins/data/*.json
 package-lock.json
+apiKeys.json
