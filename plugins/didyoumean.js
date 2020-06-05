@@ -27,7 +27,10 @@ const mod = {
 				console.log(err);
 				e.reply("D: There was an error with your regex syntax!");
 			}
-		}
+		}else{
+            cache.push([e.from.nick,e.message,Date.now()]);
+            if(cache > 200) cache.splice(0,1);
+        }
 	}
 }
 

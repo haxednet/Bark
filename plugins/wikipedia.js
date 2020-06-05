@@ -10,7 +10,7 @@ const mod = {
 				}else{
 					const J = JSON.parse(body);
 					if(J.type.indexOf("/errors/")>-1){
-						e.reply("Nothing found for " + J.title);
+						e.reply("Nothing found for " + e.input);
 					}else{
 						e.reply("" + J.title + ": " + J.extract);
 					}

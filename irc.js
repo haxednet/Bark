@@ -113,6 +113,8 @@ class irc extends EventEmitter {
 			switch(bits[1]){
 				case E.RPL_WELCOME:
 					this.emit("connected");
+                    this.nick = bits[2];
+                    this.config.nick = bits[2];
 					for(let i in this.config.channels){
 						setTimeout(function(){
 							myself.sendData("JOIN " + myself.config.channels[i] );
@@ -219,6 +221,7 @@ class irc extends EventEmitter {
 					
 				case "JOIN":
 					usr = parseUser(bits[0]);
+                    console.log(this.nick.toLowerCase());
 					if(usr.nick.toLowerCase() == this.nick.toLowerCase()){
 						this.channels[bits[2].toLowerCase()] = {users: []};					
 					}else{

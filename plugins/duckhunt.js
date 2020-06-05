@@ -15,9 +15,9 @@ const mod = {
     },
     bot: null,
 	commands: [
-		{command: "bang", enabled: true, hidden: false, usage: "$bang -- shoots a duck", callback: (e)=>{bang(e);}},
-        {command: "bef", enabled: true, hidden: false, usage: "$bef -- befriends a duck", callback: (e)=>{bef(e);}},
-        {command: "befriend", enabled: true, hidden: false, usage: "$bef -- befriends a duck", callback: (e)=>{bef(e);}},
+		{command: "bang", rateLimited: false, enabled: true, hidden: false, usage: "$bang -- shoots a duck", callback: (e)=>{bang(e);}},
+        {command: "bef", rateLimited: false, enabled: true, hidden: false, usage: "$bef -- befriends a duck", callback: (e)=>{bef(e);}},
+        {command: "befriend", rateLimited: false, enabled: true, hidden: false, usage: "$bef -- befriends a duck", callback: (e)=>{bef(e);}},
         {command: "bribe", enabled: true, hidden: false, usage: "$bribe -- attempt to attract a duck. Doesn't often work, but sometimes you get lucky", callback: (e)=>{return bribe(e);}},
         {command: "starthunt", enabled: true, hidden: false, usage: "$starthunt -- starts a duck hunt in the current channel", callback: (e)=>{
             addChannelSettings(e.to.toLowerCase());
@@ -48,6 +48,7 @@ const mod = {
 		{command: "birdforce", enabled: true, hidden: true, usage: "Don't use this", callback: (e)=>{
             if(e.admin != true) return;
 			channelSettings[e.to].active = true;
+            channelSettings[e.to].lastDuck = Date.now();
             e.reply("OK!");
 		}}
 	],
@@ -82,6 +83,7 @@ function addChannelSettings(e){
     channelSettings[e.toLowerCase()].active = false;
     channelSettings[e.toLowerCase()].lastMessage = 0;
     channelSettings[e.toLowerCase()].lastBribe = 0;
+    channelSettings[e.toLowerCase()].lastDuck = 0;
 }
 
 function bef(e){
@@ -89,7 +91,7 @@ function bef(e){
         let friends = getFriends(e.username);
         friends++;
         setFriends(e.username, friends);
-        e.reply("(" + e.from.nick + ") You've befriended a duck! Your duck army has grown to " + getFriends(e.username) + " bird(s)");
+        e.reply("(" + e.from.nick + ") You've befriended a duck in " + ((Date.now()-channelSettings[e.to.toLowerCase()].lastDuck) / 1000) + " seconds! Your duck army has grown to " + getFriends(e.username) + " bird(s)");
         channelSettings[e.to.toLowerCase()].active = false;
         saveAll();
     }else{
@@ -109,7 +111,7 @@ function bang(e){
         let kills = getKills(e.username);
         kills++;
         setKills(e.username, kills);
-        e.reply("(" + e.from.nick + ") You've shot a duck!  You've killed " + getKills(e.username) + " bird(s) so far. Don't let their friends find out!");
+        e.reply("(" + e.from.nick + ") You've shot a duck in " + ((Date.now()-channelSettings[e.to.toLowerCase()].lastDuck) / 1000) + " seconds!  You've killed " + getKills(e.username) + " bird(s) so far. Don't let their friends find out!");
         channelSettings[e.to.toLowerCase()].active = false;
         saveAll();
     }else{
@@ -124,6 +126,7 @@ function bribe(e){
             if(rand(2,6) == 3){
                 e.reply(duckMessages[rand(0, duckMessages.length - 1)]);
                 channelSettings[e.to.toLowerCase()].active = true;
+                channelSettings[e.to.toLowerCase()].lastDuck = Date.now();
             }else{
                 e.reply("(" + e.from.nick + ")  The duck refused");
             }
@@ -236,6 +239,7 @@ setInterval(function(){
             if(rn == 5 || channelSettings[i].active){
                 /* everything is good, lets generate duck */
                 channelSettings[i].active = true;
+                channelSettings[i].lastDuck = Date.now();
                 mod.bot.sendData("PRIVMSG " + i + " :" + duckMessages[rand(0, duckMessages.length - 1)]);
             }
         }else{

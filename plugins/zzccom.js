@@ -19,11 +19,11 @@ const uri = "http://96.92.220.85:2082/xxx.php";
 
 const helpMsg = "improper command usage. For help see https://trello.com/b/wz7ipI2G/bark-ccom-programming-examples";
 let tinyLog = [];
-
 let perms = {
 	"tv": {"kick": true, "voice": false},
 	"suicide": {"kick": true, "voice": false},
-	"cut": {"kick": true, "voice": false},
+	"cutwire": {"kick": true, "voice": false},
+    "cut": {"kick": true, "voice": false},
 	"die": {"kick": true, "voice": true},
     "test2": {"kick": true, "voice": true},
     "hail": {"kick": true, "voice": true},
@@ -43,9 +43,12 @@ const mod = {
             switch(e.bits[1]){
                 
                 case "add":
+                    if(e.bits.length < 4) return e.reply(helpMsg);
+                    if(e.message.indexOf("dpaste.org")>-1) return e.reply("dpaste.org is no longer supported due to their removal of raw mode. Use http://dpaste.com instead.");
+                    
                     const code = e.message.substr(11 + e.bits[2].length);
                     
-                    if(e.bits.length < 4) return e.reply(helpMsg);
+                    
                     if(e.bits[2].match(/[^\x21-\x7F]/) != null) return e.reply("You may only use ASCII in ccom names");
                     if(e.bits[2].length < 2) return e.reply("ccom name is not long enough");
                     
@@ -62,9 +65,22 @@ const mod = {
                             }
                         }
                     }
-                    coms.push({command: e.bits[2], code: code, user: e.from, date: Date.now()});
-					e.reply("The command has been added");
-					saveCcom();
+                    
+                    if(code.indexOf("http://dpaste.com/") == 0){
+                        let url = code;
+                        if(code.indexOf(".txt") == -1) url = url + ".txt";
+                        request(url, {}, (err, res, body) => {
+                            if (err) { return console.log(err); }
+                            coms.push({command: e.bits[2], code: body.toString(), user: e.from, date: Date.now()});
+                            saveCcom();
+                            return e.reply("The command has been added (dpaste link)");
+                            
+                        });
+                    }else{
+                        coms.push({command: e.bits[2], code: code, user: e.from, date: Date.now()});
+                        e.reply("The command has been added");
+                        saveCcom();
+                    }
                     break;
                     
                 case "remove":
@@ -101,6 +117,7 @@ const mod = {
                         if(coms[i].command.toLowerCase() == e.bits[3].toLowerCase()) ccomFound = true;
                     }
                     maps[e.bits[2].toLowerCase()] = e.bits[3].toLowerCase();
+                    if(ccomFound == false) return e.reply(e.bits[3] + " is not a valid ccom");
                     saveCcom();
                     return e.reply(e.bits[2] + " is now mapped to " + e.bits[3]);
                     break;
@@ -140,11 +157,15 @@ const mod = {
         }}
     ],
     onPrivmsg: (e)=>{
+        let channelConf = e.config[e.to];
+        console.log(channelConf);
+        if(channelConf == undefined || channelConf.disallowedCommands == undefined) return;
         if(e.message.substr(0,1) == e.config.commandPrefix){
 			if(maps[e.bits[0].substr(1).toLowerCase()] != undefined){
 				e.bits[0] = e.config.commandPrefix + maps[e.bits[0].substr(1).toLowerCase()];
                 e.command = maps[e.bits[0].substr(1).toLowerCase()];
 			}
+            if(channelConf.disallowedCommands.includes(e.bits[0].substr(1).toLowerCase())) return;
             let replyDelay = 1;
             for(let i in coms){
                 if(coms[i].command.toLowerCase() == e.bits[0].substr(1).toLowerCase()){

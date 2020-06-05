@@ -1,6 +1,7 @@
 const tls = require('tls');
 const fs = require('fs');
 const irc = require('./irc.js');
+const homoglyph = require('./homoglyph.js');
 const plugins = [];
 const whoCache = {};
 const tinyLog = [];
@@ -83,9 +84,20 @@ function newBot(){
         whoCache[e.user.nick.toLowerCase()] = e.user.nick.toLowerCase();
         if(Date.now() - lastWho > 30000) bot.sendData("WHO " + e.channel + " %na");
         lastWho = Date.now();
+
         if(e.user.nick.toLowerCase() == config.nick.toLowerCase()){
             console.log("Joined " + e.channel);
             bot.sendData("WHO " + e.channel + " %na");
+            if(config[e.channel.toLowerCase()].autoOp != undefined && config[e.channel.toLowerCase()].autoOp == true){
+                bot.sendData("CHANSERV OP " + e.channel);
+            }
+        }else{
+            if(config[e.channel.toLowerCase()].opOnJoin != undefined){
+                for(let i in config[e.channel.toLowerCase()].opOnJoin){
+                    const uar = userAsRegex(config[e.channel.toLowerCase()].opOnJoin[i]);
+                    if(e.user.mask.match(uar) != null) bot.sendData("MODE " + e.channel + " +o " + e.user.nick);
+                }
+            }
         }
         for(let i in plugins){
             try{
@@ -138,10 +150,18 @@ function newBot(){
         if(e.number == "1"){
             console.log("Logged in to IRC, joining channels...");
         }
+        if(e.number == "433"){
+            console.log("Error: Nickname is already in use");
+            config.nick = config.nick + "_" + Date.now().toString().slice(-4);
+            bot.sendData("NICK " + config.nick);
+        }
 	});
 	
 	bot.on('privmsg', (e) => {
         if(e.message.length < 2) return;
+        if(e.message.indexOf(String.fromCharCode(12444)) > -1) return;
+        if(e.message.indexOf(String.fromCharCode(12290)) > -1) return;
+        
         e.message = e.message.replace(/\s\s/g, " ");
         if(e.message.slice(-1) == " ") e.message = e.message.slice(0,-1);
         e.bits = e.message.split(" ");
@@ -175,19 +195,13 @@ function newBot(){
             }
             
             e.admin = isAdmin(e,settings.admins);
+            e.botmaster = isAdmin(e);
+            e.settings = settings;
             
             /* if command is not allowed in this channel then return */
             if(settings.disallowedCommands.includes(e.command)) return;
             
             /* internal commands */
-            if(settings.bannedParams != undefined){
-                for(let i in settings.bannedParams){
-                    if(e.message.toLowerCase().indexOf(settings.bannedParams[i].toLowerCase()) > -1){
-                        return e.reply("Your request contains banned terms and thus can not be processed.");
-                    }
-                    
-                }
-            }
             
             switch(e.command){
                 
@@ -200,8 +214,55 @@ function newBot(){
                     }
                     break;
                     
-                case "config":
                     
+                case "ignore":
+                    if(!e.admin) return e.reply("You do not have access to this command");
+                    if(e.bits.length > 2){
+                        if(settings.ignore == undefined) settings.ignore = [];
+                        if(e.bits[1] == "add"){
+                            settings.ignore.push(e.bits[2]);
+                            e.reply(e.bits[2] + " has been added to the ignore list");
+                        }else if(e.bits[1] == "remove"){
+                            if(settings.ignore.indexOf(e.bits[2]) > -1){
+                                settings.ignore.splice(settings.ignore.indexOf(e.bits[2]), 1);
+                                e.reply(e.bits[2] + " has been removed from the ignore list");
+                            }else{
+                                e.reply("Could not find this item in ignore list");
+                            }
+                        }
+                    }else{
+                        return e.reply("Usage: " + config.commandPrefix + "ignore (add|remove) mask");
+                    }
+                    break;
+                    
+                case "bannedparams":
+                    if(!e.admin) return e.reply("You do not have access to this command");
+                    if(e.bits.length > 2){
+                        if(settings.bannedParams == undefined) settings.bannedParams = [];
+                        if(e.bits[1] == "add"){
+                            settings.bannedParams.push(e.bits[2]);
+                            return e.reply(e.bits[2] + " has been added to the ban list");
+                        }else if(e.bits[1] == "remove"){
+                            if(settings.bannedParams.indexOf(e.bits[2]) > -1){
+                                settings.bannedParams.splice(settings.bannedParams.indexOf(e.bits[2]), 1);
+                                return e.reply(e.bits[2] + " has been removed from the ban list");
+                            }else{
+                                return e.reply("Could not find this item in banned params list");
+                            }
+                        }
+                    }else{
+                        return e.reply("Usage: " + config.commandPrefix + "bannedparams (add|remove) item");
+                    }
+                    break;
+                
+                case "save":
+                    if(!isAdmin(e)) return e.reply("You do not have access to this command");
+                    if(fs.existsSync('config.json.bak')) fs.unlinkSync("config.json.bak");
+                    fs.rename('config.json', 'config.json.bak', (err) => {
+                        fs.writeFile("config.json", JSON.stringify(config, null, 4), function(err) {
+                            e.reply("config has been saved to disk");
+                        }); 
+                    });
                     break;
                 
                 case "pload":
@@ -245,7 +306,11 @@ function newBot(){
                     break;
                  
                 case "whoami":
-                    return e.reply("Your nick is " + e.from.nick + ", but I think you're actually " + e.username);
+                    if(e.admin){
+                        return e.reply("Your nick is " + e.from.nick + ", but I think you're actually " + e.username + ". I also think you're an admin.");
+                    }else{
+                        return e.reply("Your nick is " + e.from.nick + ", but I think you're actually " + e.username);
+                    }
                     break;
                 case "whois":
                     return e.reply("Their nick is " + e.input + ", but I think they're actually " + getUser(e.input));
@@ -316,8 +381,20 @@ function newBot(){
                     break;
             }
             
-            if(Date.now() - rateLimit < 2000) return;
-            rateLimit = Date.now();
+            if(settings.ignore != undefined){
+                for(let i in settings.ignore){
+                    if(e.from.mask.match(userAsRegex(settings.ignore[i])) != null) return;
+                }
+            }
+            
+            if(settings.bannedParams != undefined){
+                for(let i in settings.bannedParams){
+                    if(homoglyph.stringify(e.message).indexOf(settings.bannedParams[i].toLowerCase()) > -1){
+                        return e.reply("Your request contains banned terms and thus can not be processed.");
+                    }
+                    
+                }
+            }
             
             /* plugin commands */
             
@@ -325,6 +402,8 @@ function newBot(){
             for(let i in plugins){
                 for(let j in plugins[i].plugin.commands){
                     if(plugins[i].plugin.commands[j].command == e.command){
+                        if(Date.now() - rateLimit < 2000 && plugins[i].plugin.commands[j].rateLimited == undefined) return;
+                        rateLimit = Date.now();
                         try{
                             let result = plugins[i].plugin.commands[j].callback(e);
                             return;

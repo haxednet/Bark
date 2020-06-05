@@ -1,8 +1,8 @@
 ﻿const request = require('request');
 
 const mod = {
-	hook_commands: [
-		{command: "urban", usage: "Searches urban dictionary. Type $urban term", hidden: true, callback: (e)=>{
+	commands: [
+		{command: "urban", usage: "Searches urban dictionary. Type $urban term", hidden: false, enabled: true, callback: (e)=>{
 			request('http://api.urbandictionary.com/v0/define?term=' + e.input, (error, response, body)=>{
 				if(error){
 					e.reply("Error :(");
