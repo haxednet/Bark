@@ -1,4 +1,7 @@
 <?php
+
+
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('max_execution_time', 0);
@@ -10,17 +13,14 @@ require_once('vendor/autoload.php');
 
 if(!isset($_REQUEST["key"])) die("Permission denied");
 
-function genKey(){
-    $t = strval(time());
-    $alpha = "ABCDEabcde";
-    $x1 = $alpha[$t[6]];
-    $x1 .= $alpha[$t[7]];
-    $x1 .= $alpha[$t[8]];
-    $x1 .= $alpha[$t[9]];
-    return $x1;
-}
+$key = file_get_contents("key.txt");
 
-if(substr($_REQUEST["key"],-4) != genKey()) die("Permission denied");
+if($key == $_REQUEST["key"] && $_REQUEST["key"] != "NULL"){
+    file_put_contents("key.txt", "NULL");
+}else{
+    file_put_contents("key.txt", "NULL");
+    die("Permission denied");
+}
 
 $_REQUEST["key"] = "";
 $_POST["key"] = "";
@@ -59,7 +59,7 @@ $sandbox->defineConst("channel", $_REQUEST['channel']);
 /////////////////////////////////////
 $sandbox->setOption('allow_functions', true);
 $sandbox->setOption('allow_variables', true);
-$sandbox->setOption('allow_classes', true);
+$sandbox->setOption('allow_classes', false);
 $sandbox->setOption('allow_static_variables', true);
 $sandbox->setOption('allow_closures', true);
 $sandbox->setOption('sandbox_includes', true);
@@ -68,6 +68,11 @@ $sandbox->setOption('allow_includes', true);
 $sandbox->setOption('validate_types', false);
 $sandbox->setOption('validate_constants', false);
 $sandbox->setOption('time_limit', 140);
+$sandbox->setOption('allow_references', false);
+$sandbox->setOption('allow_casting', false);
+$sandbox->setOption('allow_traits', false);
+$sandbox->setOption('overwrite_sandboxed_string_funcs', true);
+
 
 
 
@@ -330,6 +335,9 @@ $sandbox->whitelistFunc("tanh");
 $sandbox->whitelistFunc("date_default_timezone_set");
 
 
+$sandbox->blacklistFunc("file_get_contents");
+
+
 $sandbox->defineFunc("sleep", function($e){
 		flush();
 		ob_flush();
@@ -461,6 +469,6 @@ $sandbox->defineFunc("voice", function($e){
 
 include("error_handle.php");
 
-
+ini_set("open_basedir", "/var/node/test/node_modules/.bin/:/var/www/html");
 $result = $sandbox->execute($code . ";");
 ?>

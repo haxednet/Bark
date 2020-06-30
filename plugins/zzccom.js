@@ -186,6 +186,8 @@ const mod = {
 
             for(let i in coms){
                 if(coms[i].command.toLowerCase() == e.bits[0].substr(1).toLowerCase()){
+                    key = genKey();
+                    fs.writeFileSync('/var/www/html/key.txt', key, 'utf8');
                     const formData = {
 						compile: 1,
 						channel: e.to,
@@ -196,7 +198,7 @@ const mod = {
 						adder: e.from.mask,
 						users: JSON.stringify(mod.bot.getChannelObject(e.to).users),
 						log: JSON.stringify(e.log),
-                        key: genKey()
+                        key: key
 					}
                     var r = request.post({url: uri, formData: formData}, function (error, response, body) {
 						if (error || response.statusCode != 200) {
@@ -263,16 +265,13 @@ function injectObject(a, b){
 }
 
 function genKey(){
-    const alpha = "ABCDEabcde";
+    const alpha = "AbCdEfGhIjKlMnOp";
     const d = parseInt(Date.now() / 1000).toString().slice(-4).split("");
     let rt = "";
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 20; i++) {
         rt += alpha[Math.floor(Math.random() * 10)];
     }
-    for(let i in d){
-        rt += alpha[d[i]];
-    }
-    
+
     return rt;
 }
 
