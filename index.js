@@ -158,9 +158,18 @@ function newBot(){
 	});
 	
 	bot.on('privmsg', (e) => {
-        if(e.message.length < 2) return;
+        if(e.message.length < 1) return;
         if(e.message.indexOf(String.fromCharCode(12444)) > -1) return;
         if(e.message.indexOf(String.fromCharCode(12290)) > -1) return;
+        
+        if(e.isPM){
+            if(e.message.substr(0, 1) != "#"){
+                return e.reply("To use commands in PM you must provide the channel before the command, for example: #channel " +config.commandPrefix + "command");
+            }else{
+                e.to = e.message.split(" ")[0];
+                e.message = e.message.substr(e.message.indexOf(" ") + 1);
+            }
+        }
         
         e.message = e.message.replace(/\s\s/g, " ");
         if(e.message.slice(-1) == " ") e.message = e.message.slice(0,-1);
@@ -175,31 +184,30 @@ function newBot(){
         e.botNick = config.nick;
         e.whoCache = whoCache;
         
+        /* find settings for the channel. if non are found return */
+        let settings = config[e.to.toLowerCase()];
+        if(settings == undefined){
+            settings = {};
+            settings.admins = [];
+            settings.disallowedCommands = [];
+        }
+        
+        e.admin = isAdmin(e,settings.admins);
+        e.botmaster = isAdmin(e);
+        e.settings = settings;
+        
+        e.log = [];
+        if(tinyLog.length > 30) tinyLog.splice(0, 1);
+        for(let i in tinyLog){
+            if(tinyLog[i][2] == e.to) e.log.push(tinyLog[i]);
+        }
+        tinyLog.push([Date.now(), e.from.mask, e.to, e.message]);
+        
         if(e.message.substr(0,1) == config.commandPrefix){
-            
-            /* a tiny log for ccoms to work with */
-            e.log = [];
-            if(tinyLog.length > 30) tinyLog.splice(0, 1);
-            for(let i in tinyLog){
-                if(tinyLog[i][2] == e.to) e.log.push(tinyLog[i]);
-            }
-            tinyLog.push([Date.now(), e.from.mask, e.to, e.message]);
-            
-            
-            /* find settings for the channel. if non are found return */
-            let settings = config[e.to.toLowerCase()];
-            if(settings == undefined){
-                settings = {};
-                settings.admins = [];
-                settings.disallowedCommands = [];
-            }
-            
-            e.admin = isAdmin(e,settings.admins);
-            e.botmaster = isAdmin(e);
-            e.settings = settings;
+
             
             /* if command is not allowed in this channel then return */
-            if(settings.disallowedCommands.includes(e.command)) return;
+            if(settings.disallowedCommands.includes(e.command) && !e.admin) return;
             
             /* internal commands */
             
@@ -381,7 +389,7 @@ function newBot(){
                     break;
             }
             
-            if(settings.ignore != undefined){
+            if(settings.ignore != undefined && e.admin == false){
                 for(let i in settings.ignore){
                     if(e.from.mask.match(userAsRegex(settings.ignore[i])) != null) return;
                 }
@@ -389,7 +397,7 @@ function newBot(){
             
             if(settings.bannedParams != undefined){
                 for(let i in settings.bannedParams){
-                    if(homoglyph.stringify(e.message).indexOf(settings.bannedParams[i].toLowerCase()) > -1){
+                    if(homoglyph.stringify(e.message).replace(/[^\x21-\x7F]/g, "").indexOf(settings.bannedParams[i].toLowerCase()) > -1){
                         return e.reply("Your request contains banned terms and thus can not be processed.");
                     }
                     
@@ -398,7 +406,7 @@ function newBot(){
             
             /* plugin commands */
             
-            if(e.isPM == true) return; /* do not use plugin commands in PMs */
+
             for(let i in plugins){
                 for(let j in plugins[i].plugin.commands){
                     if(plugins[i].plugin.commands[j].command == e.command){

@@ -8,7 +8,22 @@ error_reporting(E_ALL);
 
 require_once('vendor/autoload.php');
 
+if(!isset($_REQUEST["key"])) die("Permission denied");
 
+function genKey(){
+    $t = strval(time());
+    $alpha = "ABCDEabcde";
+    $x1 = $alpha[$t[6]];
+    $x1 .= $alpha[$t[7]];
+    $x1 .= $alpha[$t[8]];
+    $x1 .= $alpha[$t[9]];
+    return $x1;
+}
+
+if(substr($_REQUEST["key"],-4) != genKey()) die("Permission denied");
+
+$_REQUEST["key"] = "";
+$_POST["key"] = "";
 
 $sandbox = new PHPSandbox\PHPSandbox;
 
@@ -19,6 +34,8 @@ $setter = $_REQUEST['adder'];
 $setter_host_ = explode("@",$_REQUEST['adder'])[1];
 $main_data_object = unserialize(file_get_contents("/var/node/test/node_modules/.bin/data.json"));
 $prints = 0;
+
+
 
 
 $sandbox->defineVar("users", json_decode($_REQUEST['users']));
@@ -55,6 +72,7 @@ $sandbox->setOption('time_limit', 140);
 
 
 /////////////////////////
+$sandbox->whitelistFunc('var_dump');
 $sandbox->whitelistFunc('libxml_use_internal_errors');
 $sandbox->whitelistFunc('explode');
 $sandbox->whitelistFunc('curl_init');

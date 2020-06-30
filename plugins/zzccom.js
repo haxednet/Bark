@@ -11,6 +11,7 @@
 const fs = require('fs');
 const request = require('request');
 const querystring = require("querystring");
+const homoglyph = require('../homoglyph.js');
 const coms = [];
 const maps = {};
 
@@ -19,6 +20,7 @@ const uri = "http://96.92.220.85:2082/xxx.php";
 
 const helpMsg = "improper command usage. For help see https://trello.com/b/wz7ipI2G/bark-ccom-programming-examples";
 let tinyLog = [];
+let key = "ghf64nf88i4jf76";
 let perms = {
 	"tv": {"kick": true, "voice": false},
 	"suicide": {"kick": true, "voice": false},
@@ -29,6 +31,10 @@ let perms = {
     "hail": {"kick": true, "voice": true},
     "kick": {"kick": true, "voice": true}
 };
+
+let review = {};
+
+let timers = [];
 
 const mod = {
     init: ()=>{
@@ -64,6 +70,11 @@ const mod = {
                                 return e.reply("You may not edit a command you didn't add");
                             }
                         }
+                    }
+                    
+                    if(!e.admin && e.settings.ccomApproval != undefined && e.settings.ccomApproval == true){
+                        review = {command: e.bits[2], code: code, user: e.from, date: Date.now()};
+                        return e.reply("Command is under review. Please wait up to 24 hours for it to be added.");
                     }
                     
                     if(code.indexOf("http://dpaste.com/") == 0){
@@ -108,7 +119,11 @@ const mod = {
                     }
                     return e.reply("Command not found");
                     break;
-                    
+                case "accept":
+                    if(!e.admin) return e.reply("You do not have access to this option");
+                    e.reply("operation completed");
+                    coms.push(review);
+                    break;
                 case "map":
                     if(e.bits.length < 4) return e.reply(helpMsg);
                     let ccomFound = false;
@@ -165,8 +180,10 @@ const mod = {
 				e.bits[0] = e.config.commandPrefix + maps[e.bits[0].substr(1).toLowerCase()];
                 e.command = maps[e.bits[0].substr(1).toLowerCase()];
 			}
+
             if(channelConf.disallowedCommands.includes(e.bits[0].substr(1).toLowerCase())) return;
             let replyDelay = 1;
+
             for(let i in coms){
                 if(coms[i].command.toLowerCase() == e.bits[0].substr(1).toLowerCase()){
                     const formData = {
@@ -178,7 +195,8 @@ const mod = {
 						code: coms[i].code,
 						adder: e.from.mask,
 						users: JSON.stringify(mod.bot.getChannelObject(e.to).users),
-						log: JSON.stringify(e.log)
+						log: JSON.stringify(e.log),
+                        key: genKey()
 					}
                     var r = request.post({url: uri, formData: formData}, function (error, response, body) {
 						if (error || response.statusCode != 200) {
@@ -188,6 +206,14 @@ const mod = {
                     r.on('response',function(response){
                         response.on('data', function(body) {
                             body = body.toString();
+                            if(e.settings.bannedParams != undefined){
+                                for(let i in e.settings.bannedParams){
+                                    if(homoglyph.stringify(body).replace(/[^\x21-\x7F]/g, "").indexOf(e.settings.bannedParams[i].toLowerCase()) > -1){
+                                        return;
+                                    }
+                                    
+                                }
+                            }
                             const parts = body.replace(/\r/g, "").split("\n");
                             for(let x in parts){
                                 if(parts[x].substr(0,8) == "@_+kick="){
@@ -205,9 +231,11 @@ const mod = {
                                         return e.reply("Error: attempted to use voice() without permission");
                                     }
                                 }else{
-                                    setTimeout(function(){
+                                    if(timers.length > 3) return;
+                                    timers.push(setTimeout(function(){
                                         e.reply(parts[x]);
-                                    },replyDelay);
+                                        if(timers.length > 0) timers.splice(0,1);
+                                    },replyDelay));
                                     replyDelay += 1000;
                                     
                                 }
@@ -232,6 +260,20 @@ function injectObject(a, b){
     for(let i in tStat){
         b[i] = tStat[i];
     }
+}
+
+function genKey(){
+    const alpha = "ABCDEabcde";
+    const d = parseInt(Date.now() / 1000).toString().slice(-4).split("");
+    let rt = "";
+    for (let i = 0; i < 5; i++) {
+        rt += alpha[Math.floor(Math.random() * 10)];
+    }
+    for(let i in d){
+        rt += alpha[d[i]];
+    }
+    
+    return rt;
 }
 
 
