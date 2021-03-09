@@ -52,7 +52,7 @@ class irc extends EventEmitter {
 		}
 		
 		function connectionEst(){
-			let caps = ["multi-prefix", "account-notify"];
+			let caps = ["multi-prefix", "account-notify", "userhost-in-names", "away-notify", "extended-join"];
 			if(myself.config.auth.type == "sasl_plain") caps.push("sasl");
 			myself.emit("connect");
 			myself.sendData("CAP REQ :" + caps.join(" "));
@@ -151,9 +151,9 @@ class irc extends EventEmitter {
 						large channels send users in multiple packets, so we need to cache them
 						until we get RPL_ENDOFNAMES
 					*/
-					cMsg = cMsg.replace(/\@|\+/g,"");
-					if(this.channels[bits[4].toLowerCase()] == undefined) this.channels[bits[4].toLowerCase()] = {users: []};
-					this.channels[bits[4].toLowerCase()].users = this.channels[bits[4].toLowerCase()].users.concat(cMsg.split(" "));
+					//cMsg = cMsg.replace(/\@|\+/g,"");
+					//if(this.channels[bits[4].toLowerCase()] == undefined) this.channels[bits[4].toLowerCase()] = {users: []};
+					//this.channels[bits[4].toLowerCase()].users = this.channels[bits[4].toLowerCase()].users.concat(cMsg.split(" "));
 					//this.cache += " " + cMsg;
 					break;
 			}
@@ -218,16 +218,17 @@ class irc extends EventEmitter {
 						}});
 					}
 					break;
-					
+				case "MODE":
+
+                    break;
 				case "JOIN":
 					usr = parseUser(bits[0]);
-                    console.log(this.nick.toLowerCase());
 					if(usr.nick.toLowerCase() == this.nick.toLowerCase()){
 						this.channels[bits[2].toLowerCase()] = {users: []};					
 					}else{
 						if(this.channels[bits[2].toLowerCase()].users.includes(usr.nick) == false) this.channels[bits[2].toLowerCase()].users.push(usr.nick);
 					}
-					this.emit("join", {user: usr, channel: bits[2]});
+					this.emit("join", {user: usr, channel: bits[2], data: e});
 					break;
 					
 				case "PART":
@@ -266,6 +267,7 @@ class irc extends EventEmitter {
 	
 	sendData(e){
 		log(e);
+        
 		try{
 			this.client.write( e + "\r\n" );
 		}catch(a){

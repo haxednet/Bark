@@ -81,7 +81,7 @@ const homoglyph = {
                 }
             }
         }
-        return parsed.join("");
+        return parsed.join("").replace(/[^ -~]+/g, "");
     }
 }
 
