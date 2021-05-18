@@ -1,6 +1,9 @@
 /*
-	Rock–paper–scissors
+	A very complex game called rock–paper–scissors
 */
+
+let bot = null;
+let config = null;
 
 const game = {
 	choices: {r: "rock", p: "paper", s: "scissors"},
@@ -12,27 +15,28 @@ const choices = ["r","p","s"];
 
 let channel = "##defocus";
 
-let bot = "bark";
-
 let gameTimer = 0;
 
 const mod = {
-    bot: null,
+    init: (e)=>{
+        bot = e.bot;
+        config = e.config;
+    },
 	commands: [
 		{command: "rps", enabled: true, hidden: false, usage: "Starts a game of rock–paper–scissors. Example usage: $rps duckgoose", callback: (e)=>{
             channel = e.to;
-            bot = e.botNick;
-			if(e.bits.length > 1){
-                if(e.from.nick.toLowerCase() == e.bits[1].toLowerCase() || e.bits[1].toLowerCase() == e.botNick.toLowerCase()) e.bits[1] = e.botNick.toLowerCase();
+            if(e.from.nick.toLowerCase() == e._input.toLowerCase()) return e.reply("Good boys and girls don't play with themselves.");
+			if(e.args.length > 1){
+                if(e.from.nick.toLowerCase() == e.args[1].toLowerCase() || e.args[1].toLowerCase() == e.botNick.toLowerCase()) e.args[1] = e.botNick.toLowerCase();
 				if(game.player1.nick != "") return e.reply("Game already in progress...");
-				e.reply( e.bits[1] + ": " + e.from.nick + " has challenged you to a game of rock–paper–scissors!");
-				e.reply( e.bits[1] + " & " + e.from.nick + ": Make your choice by sending /notice " + e.botNick + " [r|p|s]");
+				e.reply( e.args[1] + ": " + e.from.nick + " has challenged you to a game of rock–paper–scissors!");
+				e.reply( e.args[1] + " & " + e.from.nick + ": Make your choice by sending /notice " + e.botNick + " [r|p|s]");
 				game.player1.nick = e.from.nick.toLowerCase();
-				game.player2.nick = e.bits[1].toLowerCase();
-                if(e.bits[1] == e.botNick) game.player2.choice = choices[rand(0,2)];
+				game.player2.nick = e.args[1].toLowerCase();
+                if(e.args[1] == config.bot.nick) game.player2.choice = choices[rand(0,2)];
 				gameTimer = setTimeout(function(){
 					if(game.player1.choice == "" || game.player2.choice == ""){
-						mod.bot.sendData("PRIVMSG " + channel + " :Waited 60 seconds for selection. Game ended.");
+						bot.sendData("PRIVMSG " + channel + " :Waited 60 seconds for selection. Game ended.");
 						game.player1.nick = "";
 						game.player2.nick = "";
 						game.player1.choice = "";
@@ -74,13 +78,13 @@ function checkForWin(){
 		const p1 = game.player1;
 		const p2 = game.player2;
 		if(p2.choice == p1.choice){
-			mod.bot.sendData("PRIVMSG " + channel + " :You've both chosen " + game.choices[p1.choice] + "! Try again");
+			bot.sendData("PRIVMSG " + channel + " :You've both chosen " + game.choices[p1.choice] + "! Try again");
 			p2.choice = "";
 			p1.choice = "";
-            if(game.player2.nick == bot.toLowerCase()) game.player2.choice = choices[rand(0,2)];
+            if(game.player2.nick == config.bot.nick.toLowerCase()) game.player2.choice = choices[rand(0,2)];
             gameTimer = setTimeout(function(){
                 if(game.player1.choice == "" || game.player2.choice == ""){
-                    mod.bot.sendData("PRIVMSG " + channel + " :Waited 60 seconds for selection. Game ended.");
+                    bot.sendData("PRIVMSG " + channel + " :Waited 60 seconds for selection. Game ended.");
                     game.player1.nick = "";
                     game.player2.nick = "";
                     game.player1.choice = "";
@@ -89,7 +93,7 @@ function checkForWin(){
             },60000);
 		}else{
 			const winner = win(p1.choice,p2.choice);
-			mod.bot.sendData("PRIVMSG " + channel + " :" + winner.message + "! " + winner.nick + " wins!");
+			bot.sendData("PRIVMSG " + channel + " :" + winner.message + "! " + winner.nick + " wins!");
 			p2.choice = "";
 			p1.choice = "";
 			p2.nick = "";

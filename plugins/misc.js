@@ -1,3 +1,5 @@
+let p = false;
+
 const mod = {
 	commands: [
 		{command: "coffee", enabled: true, hidden: false, usage: "Gives your friend a nice cup for joe! Usage: $coffee duckgoose", callback: (e)=>{
@@ -6,10 +8,19 @@ const mod = {
         
 		{command: "beer", enabled: true, hidden: false, usage: "Gives your friend a cold beer! Usage: $beer duckgoose", callback: (e)=>{
             e.reply("\u0001ACTION hands " + e._input + " a cold " + randomItem(["Bud Light", "Bud Light Lime", "Budweiser", "Michelob Ultra","Miller Lite", "Coors Light", "O’Douls.", "Bud Lite", "Blue Moon", "Yuengling", "Corona Extra", "Corona Light", "Stella Artois", "Heineken"]) + "\u0001");
+		}},
+        
+		{command: "xxx", enabled: true, hidden: false, usage: "Nothing", callback: (e)=>{
+            console.log(p);
 		}}
 	],
+    
+    init: (e)=>{
+        p = e;
+    },
+    
 	onPrivmsg: (e)=>{
-		if(e._input == "voteban") e.reply("we don't do that vote stuff");
+		if(e.message.substr(1,7) == "voteban") e.reply("we don't do that vote stuff");
 	}
 }
 

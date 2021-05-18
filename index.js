@@ -1,3 +1,11 @@
+/* ENUMERATORS \o/ */
+const PERMISSION_ERROR = "Elevated privileges required for command $com";
+const NOT_ENOUGH_ARGS = "Not enough arguments for command $com";
+const INVALID_ARGUMENTS = "Invalid arguments";
+const ABOUT_BARK = "Bark 3.0 is a nodejs powered modular IRCv3 bot created by Matthew Ryan. https://github.com/haxednet/Bark";
+/* ************* */
+
+
 const fs = require('fs');
 if( !fs.existsSync("config.json") ) return console.log("ERROR: You must have a config.json file to use this program");
 
@@ -19,6 +27,7 @@ const banHammer = [];
 console.log("           __\r\n      (___()'`;   BARK v3!\r\n      /,    /`\r\n      \\\"--\\");
 
 
+
 function loadPlugins(){
     /* Load all the .js files from /plugins/ and put them in the plugins variable */
     const files = fs.readdirSync('./plugins');
@@ -30,24 +39,24 @@ function loadPlugins(){
                 delete(plugins[file]);
                 const mod = require("./plugins/" + file);
                 plugins[file] = mod;
-                if(mod.init != undefined) mod.init();
+                const e = {config: config, bot: bot, dataStore: dataStore, whoCache: whoCache, keys: keys, httpGet: httpGet, chatLog: chatLog};
+                if(mod.init != undefined) mod.init(e);
             }catch(err){
                 console.log("The plugin " + file + " has caused an error and will not be loaded.");
                 delete(plugins[file]);
+                throw(err);
             }
 		}
 	});
 }
 
 
-loadPlugins();
-console.log("Plugins loaded. Starting the IRC bot...");
-
-
-
 
 /* Create the bot and begin the connection to IRC */
 const bot = new irc( config.bot );
+
+/* Load the plugins */
+loadPlugins();
 
 /* send the bot variable to the plugins */
 for(let i in plugins){
@@ -59,7 +68,6 @@ bot.on('data', (e) => {
     const args = e.split(" ");
     let nick = "";
     console.log(e);
-    //:Ricardus_!~rich@cpe-69-207-102-146.rochester.res.rr.com ACCOUNT Ricardus
     switch(args[1]){
         
         case "ACCOUNT":
@@ -77,6 +85,9 @@ bot.on('data', (e) => {
             }
             break;
     }
+    for(let i in plugins){
+        if(plugins[i].onData) plugins[i].onData(e);
+    }
 });
 
 
@@ -87,17 +98,41 @@ bot.on('join', (e) => {
     
     if(config.bot.nick.toLowerCase() == e.user.nick.toLowerCase()){
         /* We've joined a new channel */
-        if(chanConfig.autoOp) bot.sendPrivmsg("chanserv", "op " + e.channel.toLowerCase());
+        if(chanConfig.opOnJoin) bot.sendPrivmsg("chanserv", "op " + e.channel.toLowerCase());
     }else{
-        const bits = e.data.split(" ");
-        if(bits[3] == "*"){
-            whoCache[e.user.nick.toLowerCase()] = [e.user.nick.toLowerCase(), e.user.mask];
-        }else{
-            whoCache[e.user.nick.toLowerCase()] = [bits[3], e.user.mask];
+        /*
+        if we have too many users in the whoCache then
+        we shouldn't add more, to prevent running out of memory.
+        
+        This is unlikely to happen because whoCache is repolled
+        every hour.
+        */
+        if(Object.keys(whoCache).length < 10000){
+            const bits = e.data.split(" ");
+            if(bits[3] == "*"){
+                whoCache[e.user.nick.toLowerCase()] = [e.user.nick.toLowerCase(), e.user.mask, false];
+            }else{
+                whoCache[e.user.nick.toLowerCase()] = [bits[3], e.user.mask, true];
+            }
         }
+    }
+    
+    for(let i in plugins){
+        if(plugins[i].onJoin) plugins[i].onJoin(e);
     }
 });
 
+bot.on('kick', (e) => {
+    if(e.kicked.toLowerCase() == config.bot.nick.toLowerCase()){
+        const chanConfig = config.channels[e.channel.toLowerCase()];
+        if(chanConfig && chanConfig["autoRejoin"]){
+            bot.sendData("JOIN " + e.channel);
+            setTimeout(function(){
+                 bot.sendData("PRIVMSG " + e.channel + " :" + e.kicker + " that's rude...");
+            },500);
+        }
+    }
+});
 
 bot.on('numeric', (e) => {
     const args = e.data.split(" ");
@@ -120,13 +155,14 @@ bot.on('numeric', (e) => {
         const nicks = e.data.substr(e.data.indexOf(" :") + 2).split(" ");
         for(let i in nicks){
             const fnick = nicks[i].replace(/\!|\@/g, " ").split(" ");
-            whoCache[fnick[0].toLowerCase()] = [fnick[0].toLowerCase(), nicks[i]];
+            whoCache[fnick[0].toLowerCase()] = [fnick[0].toLowerCase(), nicks[i], false];
         }
     }
     
     if(e.number == "354"){
         /* WHO reply */
-        whoCache[args[5].toLowerCase()] = [args[6], args[5] + "!" + args[3] + "@" + args[4]];
+        if(args[6] == "0") args[6] = args[5];
+        whoCache[args[5].toLowerCase()] = [args[6], args[5] + "!" + args[3] + "@" + args[4], true];
     }
     
     if(e.number == "315"){
@@ -137,15 +173,58 @@ bot.on('numeric', (e) => {
             }, 2000);
         }
     }
+    for(let i in plugins){
+        if(plugins[i].onNumeric) plugins[i].onNumeric(e);
+    }
 });
 
 
 bot.on('quit', (e) => {
     delete whoCache[e.user.nick.toLowerCase()];
+    for(let i in plugins){
+        if(plugins[i].onQuit) plugins[i].onQuit(e);
+    }
+});
+
+bot.on('part', (e) => {
+    if(e.user.nick.toLowerCase() == config.bot.nick.toLowerCase()){
+        const chanConfig = config.channels[e.channel.toLowerCase()];
+        if(chanConfig && chanConfig["autoRejoin"]){
+            bot.sendData("JOIN " + e.channel);
+            setTimeout(function(){
+                if(e.message.indexOf("requested by") > -1){
+                    bot.sendData("PRIVMSG " + e.channel + " :" + e.message.split(" ")[2] + " that's rude...");
+                }
+            },500);
+        }
+    }
+});
+
+bot.on('notice', (e) => {
+    for(let i in plugins){
+        if(plugins[i].onNotice) plugins[i].onNotice(e);
+    }
 });
 
 bot.on('privmsg', (e) => {
     //console.log(e);
+    
+    /* allow commands in PMs */
+    if(e.to.substr(0,1) != "#"){
+        if(e.message.substr(0,1) == "#"){
+            if(config.channels[e.message.split(" ")[0]] != undefined){
+                if(config.channels[e.message.split(" ")[0]].allowCommandsInPM){
+                    e.to = e.message.split(" ")[0];
+                    e.message = e.message.substr(e.message.indexOf(" ") + 1);
+                }else{
+                    return e.reply("Commands in PM are disabled for this channel");
+                }
+            }
+        }else{
+            return e.reply("To use commands in PM you must first supply the channel in your message to which the command will be ran, e.g.: #channel .help");
+        }
+    }
+    
     if(e.isPM == false){
         /* chatLog is a small log of chat messages for diagnostic usage */
         chatLog.push([Date.now(), e.from.mask, e.to, e.message]);
@@ -155,6 +234,7 @@ bot.on('privmsg', (e) => {
     const input = e.message.substr(1).replace(/\s\s/g, " ").trim();
     const _input = e.message.substr(e.message.indexOf(" ") + 1);
     const args = input.split(" ");
+    const chanConfig = config.channels[e.to.toLowerCase()];
     
     /* some things need to be added to e. this gives plugins added functionality by passing e to them. */
     e.command = args[0].toLowerCase();
@@ -163,16 +243,105 @@ bot.on('privmsg', (e) => {
     e.args = args;
     e.admin = isAdmin(e.from.mask,e.to.toLowerCase());
     e.channel = e.to.toLowerCase();
+    e.dataStore = dataStore;
     e.whoCache = whoCache;
-    e.keys = keys;
-    e.httpGet = httpGet;
+    e.bot = bot;
+    e.channel = e.to;
+    e.chanConfig = chanConfig;
+    e.kick = kick;
+    e.ban = ban;
+    e.kickBan = kickBan;
     
+    /* check for ban words and kick words if they're not admin */
+    if(chanConfig){
+        for(let i in chanConfig.kickWords){
+            if(chanConfig.kickWords[i].substr(0,1) == "/"){
+                let re = new RegExp(chanConfig.kickWords[i].slice(1,-1), "ig");
+                if(e.message.match(re) != null) kick(e.to, e.from.nick, "Please mind the language");
+            }else{
+                if(e.message.toLowerCase().indexOf(chanConfig.kickWords[i].toLowerCase()) > -1){
+                    kick(e.to, e.from.nick, "Please mind the language");
+                }
+            }
+        }
+        for(let i in chanConfig.banWords){
+            if(chanConfig.banWords[i].substr(0,1) == "/"){
+                let re = new RegExp(chanConfig.banWords[i].slice(1,-1), "ig");
+                if(e.message.match(re) != null) kickBan(e.to, e.from.nick, "Please mind the language");
+            }else{
+                if(e.message.toLowerCase().indexOf(chanConfig.banWords[i].toLowerCase()) > -1){
+                    kickBan(e.to, e.from.nick, "Please mind the language");
+                }
+            }
+        }
+    }
+    
+    /* Below is the main functionality for commands */
     if(e.message.substr(0,1) == config.globalSettings.commandPrefix){
         
         switch(e.command){
             
-            case "test":
-                e.reply("working");
+            case "plugin":
+                if(args.length < 2) return e.reply(NOT_ENOUGH_ARGS.replace(/\$com/g, e.command));
+                const pComs = {config: config, bot: bot, dataStore: dataStore, whoCache: whoCache, keys: keys, httpGet: httpGet, chatLog: chatLog};
+                if(args[1] == "load"){
+                    /* Check for botmaster access */
+                    if(!isAdmin(e.from.mask)) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
+                    if(args.length < 3) return e.reply(NOT_ENOUGH_ARGS.replace(/\$com/g, args[1]));
+                    
+                    if(!fs.existsSync("./plugins/" + args[2])) return e.reply( args[2] + " was not found");
+                    
+                    for(let i in plugins){
+                        if(i == args[2]) return e.reply("Plugin " + args[2] + " is already loaded");
+                    }
+                    delete require.cache[require.resolve("./plugins/" + args[2])];
+                    let mod = require("./plugins/" + args[2]);
+                    plugins[args[2]] = mod;
+                    if(mod.init != undefined) mod.init(pComs);
+                    return e.reply("Plugin " + args[2] + " was loaded");
+                    
+                }else if(args[1] == "unload"){
+                    /* Check for botmaster access */
+                    if(!isAdmin(e.from.mask)) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
+                    if(args.length < 3) return e.reply(NOT_ENOUGH_ARGS.replace(/\$com/g, args[1]));
+
+                    for(let i in plugins){
+                        if(i == args[2]){
+                            delete require.cache[require.resolve("./plugins/" + args[2])];
+                            delete plugins[i];
+                            return e.reply("Plugin " + args[2] + " has been unloaded");
+                        }
+                    }
+                    
+                    return e.reply("Plugin " + args[2] + " is not loaded");
+                    
+                }else{
+                    return e.reply(INVALID_ARGUMENTS);
+                }
+                break;
+            
+            case "help":
+                if(args.length > 1){
+                    if(args[1].toLowerCase() == "about") return e.reply(ABOUT_BARK);
+                    for(let i in plugins){
+                        for(let a in plugins[i].commands){
+                            if(plugins[i].commands[a].command == e._input){
+                                e.reply("[.\\plugins\\" + i + "] " + plugins[i].commands[a].usage.replace(/\$/g, config.globalSettings.commandPrefix));
+                                return;
+                            }
+                        }
+                    }
+                    e.reply("Command " + e.command + " was not found.");
+                }else{
+                    e.reply("To get help for a specific command do: " + config.globalSettings.commandPrefix + "help [command]");
+                    let commands = "";
+                    for(let i in plugins){
+                        for(let a in plugins[i].commands){
+                            commands += plugins[i].commands[a].command + ", ";
+                        }
+                    }
+                    e.reply("Commands: " + commands + " about");
+                }
                 break;
                 
             case "whois":
@@ -192,7 +361,10 @@ bot.on('privmsg', (e) => {
                             try{
                                 let result = plugins[i].commands[j].callback(e);
                             }catch(err){
-                                e.reply("Plugin " + i + " has caused an error and will now be unloaded (" + err.message + ")");
+                                console.log(err);
+                                e.reply("Plugin " + i + " has caused an error and will now be unloaded (" + err.message + ") Check the logs for more details");
+                                delete require.cache[require.resolve("./plugins/" + i)];
+                                delete plugins[i];
                             }
                         }
                     }
@@ -208,10 +380,18 @@ bot.on('privmsg', (e) => {
     }
 });
 
+
+
+
+
+/* Extra commands to help unify functionality */
+
 function isAdmin(mask, channel){
     
     if(channel == undefined){
-        
+        for(let i in config.globalSettings.botMasters){
+            if( mask.match(userAsRegex(config.globalSettings.botMasters[i])) != null ) return true;
+        }
     }else{
         if( config.channels[channel] == undefined ) return false;
         for(let i in config.channels[channel].admins){
@@ -231,6 +411,70 @@ function userAsRegex( e ){
 	return new RegExp(returnStr, "ig");
 }
 
+function httpGet(e, callback){
+    let httpo = http;
+    if(e.substr(0,5) == "https") httpo = https;
+    const host = e.split("/")[2];
+    const options ={
+        host: host,
+        path: e.substr(e.indexOf("://" + host) + host + 3)
+    };
+    const cb = function(response) {
+        let str = '';
+
+        //another chunk of data has been received, so append it to `str`
+        response.on('data', function (chunk) {
+            str += chunk;
+        });
+
+        //the whole response has been received, so we just print it out here
+        response.on('end', function () {
+            callback(str);
+        });
+    }
+    httpo.request(options, cb).end();
+}
+
+
+function dataStore(a,b){
+    const file = "./datastore/" + a + ".json";
+    let returnData = {};
+    
+    if (fs.existsSync(file)){
+        returnData = JSON.parse(fs.readFileSync(file));
+    }
+    
+    if(b != undefined){
+        returnData = b;
+        fs.writeFileSync(file, JSON.stringify(b,null,4));
+    }
+    
+    return returnData;
+}
+
+
+function kick(channel, user, reason){
+    bot.sendData("KICK " + channel + " " + user + " :" + reason);
+}
+function kickBan(channel, user, reason){
+    ban(channel, user);
+    bot.sendData("KICK " + channel + " " + user + " :" + reason);
+}
+function ban(channel, user){
+    let banUser = whoCache[user.toLowerCase()];
+    if(banUser == undefined){
+        bot.sendData("MODE " + channel + " +b " + user);
+    }else{
+        if(banUser[2]){
+            bot.sendData("MODE " + channel + " +b $a:" + banUser[0]);
+        }else{
+            bot.sendData("MODE " + channel + " +b *!" + banUser[1].split("!")[1]);
+        }
+    }
+}
+
+/* ************************ */
+
 
 /* re poll WHO every hour to prevent memory leaks */
 setInterval(()=>{
@@ -248,26 +492,3 @@ setInterval(()=>{
     //console.log(Object.keys(whoCache).length);
 },60000);
 
-function httpGet(e, callback){
-    let httpo = http;
-    if(e.substr(0,5) == "https") httpo = https;
-    const host = e.split("/")[2];
-    const options ={
-        host: host,
-        path: e.substr(e.indexOf("://" + host) + host + 3)
-    };
-    const cb = function(response) {
-        var str = '';
-
-        //another chunk of data has been received, so append it to `str`
-        response.on('data', function (chunk) {
-            str += chunk;
-        });
-
-        //the whole response has been received, so we just print it out here
-        response.on('end', function () {
-            callback(str);
-        });
-    }
-    httpo.request(options, cb).end();
-}
