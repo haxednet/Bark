@@ -9,10 +9,18 @@
     
     "commandPrefix": "!",
     
-    "##barkbarkbark": {
-        "admins": ["*!*@burdirc/developer/duckgoose"],
-        "disallowedCommands": [],
-        "autoRejoin": true
+    "##bark": {
+            "admins": ["*!*@unaffiliated/duckgoose"],
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [],
+            "kickWords": [],
+            "banWords": [],
+            "autoOp": [],
+            "banChannelNotices": true,
+            "opOnJoin": true,
+            "autoRejoin": true,
+            "allowCommandsInPM": true
     }
         
 }
