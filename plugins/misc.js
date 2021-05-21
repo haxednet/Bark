@@ -10,7 +10,7 @@ const mod = {
             e.reply("\u0001ACTION hands " + e._input + " a cold " + randomItem(["Bud Light", "Bud Light Lime", "Budweiser", "Michelob Ultra","Miller Lite", "Coors Light", "O’Douls.", "Bud Lite", "Blue Moon", "Yuengling", "Corona Extra", "Corona Light", "Stella Artois", "Heineken"]) + "\u0001");
 		}},
         
-		{command: "xxx", enabled: true, hidden: false, usage: "Nothing", callback: (e)=>{
+		{command: "debug", enabled: true, hidden: false, usage: "Nothing", callback: (e)=>{
             console.log(p);
 		}}
 	],

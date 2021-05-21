@@ -23,13 +23,23 @@ class irc extends EventEmitter {
 		this.ISUPPORT = ["CHANTYPES=#"];
 		this.channels = {};
 		this.cache = "";
+        this.sendCache = [];
+        this.sendTimer = 0;
     }
 	
 	makeSocket(){
+        clearInterval(this.sendTimer);
+       
 		this.client = new net.Socket();
 		this.client.setEncoding("UTF-8");
 		const myself = this;
-		
+        this.sendTimer = setInterval(function(){
+            if(myself.sendCache[0] != undefined){
+                console.log(myself.sendCache);
+                myself.client.write(myself.sendCache[0] + "\r\n");
+                myself.sendCache.splice(0, 1);
+            }
+        },500);
 		/*
 			if this.config.ssl is true then we need to make a TLS socket, otherwise we
 			a simple TCP socket.
@@ -211,10 +221,12 @@ class irc extends EventEmitter {
 					if(this.isChannel(bits[2])){
 						this.emit("privmsg", {botNick: myself.nick, from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: false, reply: (e)=>{
 							sendReply(bits[2], "PRIVMSG", e, myself);
+                            return true;
 						}});
 					}else{
 						this.emit("privmsg", {from: parseUser(bits[0]), to: bits[2], message: cMsg, isPM: true, reply: (e)=>{
 							sendReply(bits[0], "PRIVMSG", e, myself);
+                            return true;
 						}});
 					}
 					break;
@@ -269,8 +281,15 @@ class irc extends EventEmitter {
 		log(e);
         
 		try{
-			this.client.write( e + "\r\n" );
+            if(e.toLowerCase().indexOf("privmsg") > -1){
+                if(this.sendCache.length > 4) return;
+                this.sendCache.push(e);
+            }else{
+                this.client.write( e + "\r\n" );
+            }
+            
 		}catch(a){
+            console.log(a);
 		}
 	}
 	

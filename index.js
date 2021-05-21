@@ -100,6 +100,12 @@ bot.on('join', (e) => {
         /* We've joined a new channel */
         if(chanConfig.opOnJoin) bot.sendPrivmsg("chanserv", "op " + e.channel.toLowerCase());
     }else{
+        console.log(e.user.mask);
+        for(let i in chanConfig.autoOp){
+            const urex = userAsRegex(chanConfig.autoOp[i]);
+            if(e.user.mask.match(urex) != null) bot.sendData("MODE " + e.channel + " +o " + e.user.nick);
+        }
+        
         /*
         if we have too many users in the whoCache then
         we shouldn't add more, to prevent running out of memory.
@@ -228,7 +234,7 @@ bot.on('privmsg', (e) => {
     if(e.isPM == false){
         /* chatLog is a small log of chat messages for diagnostic usage */
         chatLog.push([Date.now(), e.from.mask, e.to, e.message]);
-        if(chatLog.length > 10240) chatLog.splice(0,1);
+        if(chatLog.length > 1024) chatLog.splice(0,1);
     }
     
     const input = e.message.substr(1).replace(/\s\s/g, " ").trim();
@@ -242,15 +248,21 @@ bot.on('privmsg', (e) => {
     e._input = _input;
     e.args = args;
     e.admin = isAdmin(e.from.mask,e.to.toLowerCase());
+    e.botMaster = isAdmin(e.from.mask);
     e.channel = e.to.toLowerCase();
     e.dataStore = dataStore;
     e.whoCache = whoCache;
     e.bot = bot;
     e.channel = e.to;
     e.chanConfig = chanConfig;
+    e.config = config;
     e.kick = kick;
     e.ban = ban;
     e.kickBan = kickBan;
+    e.chatLog = chatLog;
+    e.httpGet = httpGet;
+    e.voice = voice;
+    
     
     /* check for ban words and kick words if they're not admin */
     if(chanConfig){
@@ -280,6 +292,11 @@ bot.on('privmsg', (e) => {
     if(e.message.substr(0,1) == config.globalSettings.commandPrefix){
         
         switch(e.command){
+            
+            case "raw":
+                if(!isAdmin(e.from.mask)) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
+                bot.sendData(e.message.split(".raw ")[1]);
+                break;
             
             case "plugin":
                 if(args.length < 2) return e.reply(NOT_ENOUGH_ARGS.replace(/\$com/g, e.command));
@@ -314,10 +331,34 @@ bot.on('privmsg', (e) => {
                     }
                     
                     return e.reply("Plugin " + args[2] + " is not loaded");
+
+                }else if(args[1] == "reload"){
+                    /* Check for botmaster access */
+                    if(!isAdmin(e.from.mask)) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
+                    if(args.length < 3) return e.reply(NOT_ENOUGH_ARGS.replace(/\$com/g, args[1]));
+                    
+                    if(!fs.existsSync("./plugins/" + args[2])) return e.reply( args[2] + " was not found");
+
+                    for(let i in plugins){
+                        if(i == args[2]){
+                            delete require.cache[require.resolve("./plugins/" + args[2])];
+                            delete plugins[i];
+                        }
+                    }
+                    
+                    let mod = require("./plugins/" + args[2]);
+                    
+                    plugins[args[2]] = mod;
+                    if(mod.init != undefined) mod.init(pComs);
+                    return e.reply("Plugin " + args[2] + " was reloaded");
                     
                 }else{
                     return e.reply(INVALID_ARGUMENTS);
                 }
+                break;
+            
+            case "about":
+                return e.reply(ABOUT_BARK);
                 break;
             
             case "help":
@@ -331,7 +372,7 @@ bot.on('privmsg', (e) => {
                             }
                         }
                     }
-                    e.reply("Command " + e.command + " was not found.");
+                    return e.reply("Command " + e.command + " was not found.");
                 }else{
                     e.reply("To get help for a specific command do: " + config.globalSettings.commandPrefix + "help [command]");
                     let commands = "";
@@ -340,7 +381,7 @@ bot.on('privmsg', (e) => {
                             commands += plugins[i].commands[a].command + ", ";
                         }
                     }
-                    e.reply("Commands: " + commands + " about");
+                    return e.reply("Commands: " + commands + " about");
                 }
                 break;
                 
@@ -360,6 +401,7 @@ bot.on('privmsg', (e) => {
                         if(plugins[i].commands[j].command == e.command){
                             try{
                                 let result = plugins[i].commands[j].callback(e);
+                                if(result) return;
                             }catch(err){
                                 console.log(err);
                                 e.reply("Plugin " + i + " has caused an error and will now be unloaded (" + err.message + ") Check the logs for more details");
@@ -452,6 +494,10 @@ function dataStore(a,b){
     return returnData;
 }
 
+function voice(channel, user){
+    console.log("MODE " + channel + " +v " + user);
+    bot.sendData("MODE " + channel + " +v " + user);
+}
 
 function kick(channel, user, reason){
     bot.sendData("KICK " + channel + " " + user + " :" + reason);
