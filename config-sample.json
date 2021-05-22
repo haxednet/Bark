@@ -1,26 +1,35 @@
 {
-    "host": "irc.freenode.org",
-    "port": 6697,
-    "ssl": true,
-    "nick": "Bark_",
-    "auth": {"type": "sasl_plain", "user": "bark", "password": "hunter2"},
+    "bot": {
+        "host": "irc.libera.chat",
+        "port": 6697,
+        "ssl": true,
+        "nick": "Bark",
+        "auth": {
+            "type": "sasl_plain",
+            "user": "bark",
+            "password": "hunter2"
+        }
+    },
     
-    "botMasters": ["*!*@burdirc/developer/duckgoose"],
+    "globalSettings": {
+        "botMasters": ["*!*@2001:470:5:c75:1337:1337:1337:1337"],
+        "commandPrefix": "."
+    },
     
-    "commandPrefix": "!",
-    
-    "##bark": {
-            "admins": ["*!*@unaffiliated/duckgoose"],
+    "channels": {
+        "##defocus": {
+            "admins": ["*!*@2001:470:5:c75:1337:1337:1337:1337"],
             "disallowedCommands": [],
             "disallowedPlugins": [],
             "bannedParams": [],
-            "kickWords": [],
-            "banWords": [],
+            "kickWords": ["roasted duck"],
+            "banWords": ["nigger","faggot"],
             "autoOp": [],
             "banChannelNotices": true,
             "opOnJoin": true,
             "autoRejoin": true,
-            "allowCommandsInPM": true
+            "allowCommandsInPM": true,
+            "duckhunt": true
+        }
     }
-        
 }

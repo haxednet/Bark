@@ -39,7 +39,7 @@ class irc extends EventEmitter {
                 myself.client.write(myself.sendCache[0] + "\r\n");
                 myself.sendCache.splice(0, 1);
             }
-        },500);
+        },400);
 		/*
 			if this.config.ssl is true then we need to make a TLS socket, otherwise we
 			a simple TCP socket.
@@ -282,7 +282,7 @@ class irc extends EventEmitter {
         
 		try{
             if(e.toLowerCase().indexOf("privmsg") > -1){
-                if(this.sendCache.length > 4) return;
+                if(this.sendCache.length > 7) return;
                 this.sendCache.push(e);
             }else{
                 this.client.write( e + "\r\n" );

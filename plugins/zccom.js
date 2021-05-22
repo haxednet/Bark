@@ -210,7 +210,7 @@ const plugin = {
                             if(body.toString().indexOf("<br>Error:") > -1) return e.reply("The command failed parsing. Check the code.");
                             const messages = body.toString().replace(/\r/g,"\n").split("\n");
                             for(let a in messages){
-                                if(messages[a].length > 1){
+                                if(messages[a].length > 0){
                                     if(messages[a].substr(0,8) == "@_+kick="){
                                         let b = messages[a].split("=");
                                         if(perms[e.args[0].toLowerCase()] != undefined && perms[e.args[0].toLowerCase()].kick == true){
