@@ -123,6 +123,8 @@ bot.on('join', (e) => {
         }
     }
     
+    e.config = config;
+    e.chanConfig = chanConfig;
     for(let i in plugins){
         if(plugins[i].onJoin) plugins[i].onJoin(e);
     }
@@ -262,7 +264,9 @@ bot.on('privmsg', (e) => {
     e.chatLog = chatLog;
     e.httpGet = httpGet;
     e.voice = voice;
+    e.username = (whoCache[e.from.nick.toLowerCase()] && whoCache[e.from.nick.toLowerCase()][2]) ? whoCache[e.from.nick.toLowerCase()][0] : e.from.nick;
     
+    if(e.botMaster == true) e.admin = true;
     
     /* check for ban words and kick words if they're not admin */
     if(chanConfig){

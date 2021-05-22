@@ -11,20 +11,17 @@ const plugin = {
                 case "view":
                     if(e.args.length < 3) return e.reply(JSON.stringify(e.chanConfig));
                     if(e.chanConfig[e.args[2]]){
-                        e.reply(typeof(e.chanConfig[e.args[2]]) + ": " + JSON.stringify(e.chanConfig[e.args[2]]));
+                        return e.reply(typeof(e.chanConfig[e.args[2]]) + ": " + JSON.stringify(e.chanConfig[e.args[2]]));
                     }else{
-                        e.reply("item not found in configuration");
+                        return e.reply("item not found in configuration");
                     }
                     break;
                     
                 case "set":
                     if(e.args.length < 4) return e.reply("Set channel config's item value. " + prefix + "config set item \"value\"");
-                    if(e.chanConfig[e.args[2]]){
+
                         e.chanConfig[e.args[2]] = JSON.parse(str);
-                        e.reply("operation completed successfully");
-                    }else{
-                        e.reply("item not found in configuration");
-                    }
+                        return e.reply("operation completed successfully");
                     break;
                     
                 case "push":
@@ -33,12 +30,12 @@ const plugin = {
                         if(typeof(e.chanConfig[e.args[2]])){
                             //e.chanConfig[e.args[2]].push();
                             e.chanConfig[e.args[2]].push(JSON.parse(str));
-                            e.reply("operation completed successfully");
+                            return e.reply("operation completed successfully");
                         }else{
-                            e.reply("item is not an array");
+                            return e.reply("item is not an array");
                         }
                     }else{
-                        e.reply("item not found in configuration");
+                        return e.reply("item not found in configuration");
                     }
                     break;
                     
@@ -57,19 +54,19 @@ const plugin = {
                             }else{
                                 delete(e.chanConfig[e.args[2]][JSON.parse(str)]);
                             }
-                             e.reply("operation completed successfully");
+                             return e.reply("operation completed successfully");
                         }else{
-                            e.reply("item is not an array");
+                            return e.reply("item is not an array");
                         }
                     }else{
-                        e.reply("item not found in configuration");
+                        return e.reply("item not found in configuration");
                     }
                     break;
                     
                case "kick":
                case "ban":
                case "mode":
-                    e.reply("This command has been delegated to the admin plugin");
+                    return e.reply("This command has been delegated to the admin plugin");
                     break;
             }
             
