@@ -43,8 +43,8 @@ const mod = {
 			return e.reply("Bird friend scores: " + genFriends().substr(0,370) + "...");
 		}},
         {command: "birds", enabled: true, hidden: false, usage: "$birds user -- get the duckhunt stats for a given user", callback: (e)=>{
-			let theUser = e._input;
-			if(theUser == ""){
+			let theUser = e.args[1];
+			if(e.args.length == 1){
 				return e.reply(e.from.nick + " has killed " + getStats(e.username).kills + " and saved " + getStats(e.username).friends);
 			}else{
 				return e.reply(theUser + " has killed " + getStats(theUser).kills + " and saved " + getStats(theUser).friends);
@@ -72,7 +72,7 @@ const mod = {
     },
     onJoin: (e)=>{
         if(e.user.nick.toLowerCase() == e.config.bot.nick.toLowerCase() && e.chanConfig.duckhunt){
-            channelSettings[e.channel.toLowerCase()] = {};
+            channelSettings[e.channel.toLowerCase()] = {lastBribe: Date.now()};
             channelSettings[e.channel.toLowerCase()].enabled = true;
         }
     }
@@ -126,9 +126,9 @@ function bribe(e){
                 channelSettings[e.to.toLowerCase()].lastDuck = Date.now();
                 return e.reply(duckMessages[rand(0, duckMessages.length - 1)]);
             }else{
+                channelSettings[e.to.toLowerCase()].lastBribe = Date.now();
                 return e.reply("(" + e.from.nick + ")  The duck refused");
             }
-            channelSettings[e.to.toLowerCase()].lastBribe = Date.now();
         }else{
             return e.reply("(" + e.from.nick + ")  Bribe was used recently. Please wait longer for the ducks to forget");
         }

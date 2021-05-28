@@ -268,8 +268,16 @@ bot.on('privmsg', (e) => {
     
     if(e.botMaster == true) e.admin = true;
     
+    if(chanConfig == undefined) return;
+    
+    /* ignore messages containing banned parameters */
+    for(let i in chanConfig.bannedParams){
+        if(e.message.toLowerCase().indexOf(chanConfig.bannedParams[i].toLowerCase()) > -1 && !e.admin) return;
+        if(homoglyph.stringify(e.message.toLowerCase()).indexOf(chanConfig.bannedParams[i].toLowerCase()) > -1 && !e.admin) return;
+    }
+    
     /* check for ban words and kick words if they're not admin */
-    if(chanConfig){
+    if(chanConfig && !e.admin){
         for(let i in chanConfig.kickWords){
             if(chanConfig.kickWords[i].substr(0,1) == "/"){
                 let re = new RegExp(chanConfig.kickWords[i].slice(1,-1), "ig");
@@ -290,16 +298,58 @@ bot.on('privmsg', (e) => {
                 }
             }
         }
+        for(let i in chanConfig.ignore){
+            if(mask.match(userAsRegex(e.from.mask)) != null) return;
+        }
+        
     }
+    
+    
     
     /* Below is the main functionality for commands */
     if(e.message.substr(0,1) == config.globalSettings.commandPrefix){
         
         switch(e.command){
             
+            case "ignore":
+                if(!e.admin) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
+                if(e.args.length == 1){
+                    return e.reply("ignore (add|remove) (hostmask), ignore (list|clear)");
+                }else{
+                    if(e.args.length == 3){
+                        if(e.args[1].toLowerCase() == "add"){
+                            if(chanConfig.ignore.includes(e.args[2])) return e.reply("Item is already in ignore list");
+                            if(e.args[2].indexOf("@") < 0) e.args[2] = e.args[2] + "!*@*";
+                            chanConfig.ignore.push(e.args[2]);
+                            return e.reply(e.args[2] + " has been added to the ignore list");
+                        }else if(e.args[1].toLowerCase() == "remove"){
+                            if(!chanConfig.ignore.includes(e.args[2])) return e.reply("Item was not found in ignore list");
+                            chanConfig.ignore.splice(chanConfig.ignore.indexOf(e.args[2]), 1);
+                            return e.reply(e.args[2] + " has been removed from the ignore list");
+                        }
+                    }else if(e.args.length == 2){
+                        if(e.args[1].toLowerCase() == "list"){
+                            return e.reply(JSON.stringify(chanConfig.ignore));
+                        }else if(e.args[1].toLowerCase() == "clear"){
+                            chanConfig.ignore = [];
+                        }
+                    }
+                }
+                break;
+            
             case "raw":
                 if(!isAdmin(e.from.mask)) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
                 bot.sendData(e.message.split(".raw ")[1]);
+                break;
+                
+            case "save":
+                if(!isAdmin(e.from.mask)) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
+                if(fs.existsSync('config.json.bak')) fs.unlinkSync("config.json.bak");
+                fs.rename('config.json', 'config.json.bak', (err) => {
+                    fs.writeFile("config.json", JSON.stringify(config, null, 4), function(err) {
+                        return e.reply("config has been saved to disk");
+                    }); 
+                });
                 break;
             
             case "plugin":
@@ -450,7 +500,7 @@ function isAdmin(mask, channel){
 function userAsRegex( e ){
 	let returnStr = "";
 	for( let i in e ) {
-		returnStr += e[i].replace( /[^a-zA-Z\d\s\*:]/, "\\" + e[i] );
+		returnStr += e[i].replace( /[^a-zA-Z\d\s\*:\/\@]/, "\\" + e[i] );
 	}
 	returnStr = returnStr.replace( /\s/g, "\\s" );
 	returnStr = returnStr.replace( /\*/g, "(.*)" );
