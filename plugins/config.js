@@ -2,7 +2,7 @@ const plugin = {
 	commands: [
 		{command: "config", hidden: false, enabled: true, usage: "Edit channel configuration. $config [view|set|push|remove|save]", callback: (e)=>{
             if(!e.admin) return e.reply("ERROR: Elevated privileges required");
-            if(e.args < 2) return e.reply("ERROR: not enough parameters");
+            if(e.args.length < 2) return e.reply("ERROR: not enough parameters");
             
             const prefix = e.message.substr(0, 1);
             const str = (e.args[0] && e.args[1] && e.args[2]) ? e.message.substr(e.args[0].length+e.args[1].length+e.args[2].length+4) : "";

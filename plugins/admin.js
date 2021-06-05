@@ -2,20 +2,20 @@
 	commands: [
 		{command: "admin", hidden: false, enabled: true, usage: "$admin (ban|unban|kick|quiet|unquiet|op|deop|voice|unvoice|mode)", callback: (e)=>{
             if(!e.admin) return e.reply("ERROR: Elevated privileges required");
-            if(e.args < 2) return e.reply("ERROR: not enough parameters");
+            if(e.args.length < 2) return e.reply("ERROR: not enough parameters");
              
             const prefix = e.message.substr(0, 1);
             switch(e.args[1].toLowerCase()){
                 case "ban":
                     if(e.args.length < 3) return e.reply("Not enough arguments! " + prefix + "admin ban user");
-                    e.ban(e.to, e.args[2]);
+                    e.ban(e.args[2]);
                     break;
 
                 case "unban":
                     if(e.args.length < 3) return e.reply("Not enough arguments! " + prefix + "admin unban mask");
                     if(e.whoCache[e.args[2].toLowerCase()]){
                         let userHost = e.whoCache[e.args[2].toLowerCase()][1];
-                        e.bot.sendData("MODE " + e.channel + " -bbb *!*@" + userHost.split("@")[1] + " " + e.args[2] + " $a:" + e.args[2]);
+                        e.bot.sendData("MODE " + e.channel + " -bb *!*@" + userHost.split("@")[1] + " " + e.args[2]);
                     }else{
                         e.bot.sendData("MODE " + e.channel + " -b " + e.args[2]);
                     }

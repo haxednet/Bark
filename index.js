@@ -250,6 +250,7 @@ bot.on('privmsg', (e) => {
     e._input = _input;
     e.args = args;
     e.admin = isAdmin(e.from.mask,e.to.toLowerCase());
+    e.isAdmin = isAdmin;
     e.botMaster = isAdmin(e.from.mask);
     e.channel = e.to.toLowerCase();
     e.dataStore = dataStore;
@@ -299,7 +300,7 @@ bot.on('privmsg', (e) => {
             }
         }
         for(let i in chanConfig.ignore){
-            if(mask.match(userAsRegex(e.from.mask)) != null) return;
+            if(e.from.mask.match(userAsRegex(chanConfig.ignore[i])) != null) return;
         }
         
     }
@@ -332,6 +333,7 @@ bot.on('privmsg', (e) => {
                             return e.reply(JSON.stringify(chanConfig.ignore));
                         }else if(e.args[1].toLowerCase() == "clear"){
                             chanConfig.ignore = [];
+                            return e.reply("operation completed successfully");
                         }
                     }
                 }
@@ -439,7 +441,7 @@ bot.on('privmsg', (e) => {
                 }
                 break;
                 
-            case "whois":
+            case "whoiss":
                 if(args.length < 2) return e.reply("Not enough parameters");
                 if(whoCache[_input.toLowerCase()] == undefined){
                     e.reply("I don't know who " + _input + " is");

@@ -25,6 +25,7 @@
             "kickWords": ["roasted duck"],
             "banWords": ["nigger","faggot"],
             "autoOp": [],
+            "ignore": [],
             "banChannelNotices": true,
             "opOnJoin": true,
             "autoRejoin": true,

@@ -10,22 +10,28 @@ const plugin = {
                     if(yt){
                         console.log(yt);
                         e.httpGet("https://www.googleapis.com/youtube/v3/videos?key=AIzaSyCrTbpjMiMM7Edsp-ewTu--d7dBkCDx_xE&part=snippet&id=" + yt, (a)=>{
-                            let j = JSON.parse(a);
-                            if(j.pageInfo.totalResults != 0){
-                                e.reply("[1,0You0,4Tube] Title: " + j.items[0].snippet.title + " Uploader: " + j.items[0].snippet.channelTitle + "");
+                            try{
+                                let j = JSON.parse(a);
+                                if(j.pageInfo.totalResults != 0){
+                                    e.reply("[1,0You0,4Tube] Title: " + j.items[0].snippet.title + " Uploader: " + j.items[0].snippet.channelTitle + "");
+                                }
+                            }catch(errr){
                             }
                         });
                     }else{
                         e.httpGet("https://api.haxed.net/url/?url=" + encodeURIComponent(bits[i]), (a)=>{
-                            const d = JSON.parse(a);
-                            if(d["c-type"] == "text/html" || d["c-type"] == undefined){
-                                if(d.title != undefined){
-                                    return e.reply("Title: " + decodeHTMLEntities(d.title) + "");
+                            try{
+                                const d = JSON.parse(a);
+                                if(d["c-type"] == "text/html" || d["c-type"] == undefined){
+                                    if(d.title != undefined){
+                                        return e.reply("Title: " + decodeHTMLEntities(d.title) + "");
+                                    }
+                                }else{
+                                    if(d["c-type"]!= undefined){
+                                        return e.reply("Content-type: " + d["c-type"] + ",  Size: " + humanFileSize(parseInt(d["content-length"]), true) + "");
+                                    }
                                 }
-                            }else{
-                                if(d["c-type"]!= undefined){
-                                    return e.reply("Content-type: " + d["c-type"] + ",  Size: " + humanFileSize(parseInt(d["content-length"]), true) + "");
-                                }
+                            }catch(errrr){
                             }
                         });
                     }

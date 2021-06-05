@@ -7,14 +7,16 @@ const mod = {
     },
 	commands: [
 		{command: "weather", usage: "Get current weather conditions for given location. Usage: $weather [location]", callback: (e)=>{
-			p.httpGet("http://api.haxed.net/weather/?location=" + encodeURIComponent(e._input) + "&key=demo&v2", (a)=>{
-                a = JSON.parse(a);
-                const loc = a.data.metadata.cookies[0].value;
-                const p = a.data.response.weather.current;
+                p.httpGet("http://api.haxed.net/weather/?location=" + encodeURIComponent(e._input) + "&key=demo&v2", (a)=>{
+                    try{
+                        a = JSON.parse(a);
+                        const loc = a.data.metadata.cookies[0].value;
+                        const p = a.data.response.weather.current;
 
-                e.reply("Weather for " + loc.locality + ", " + loc.adminDistrict + ", " + loc.country + ": " + p.current_temp + "F / " + fToC(p.current_temp) + "C. " + p.description + "; Humidity: " + p.humidity + "%; Wind speed: " + p.windSpeed + " MPH");
-                
-            });
+                        return e.reply("Weather for " + loc.locality + ", " + loc.adminDistrict + ", " + loc.country + ": " + p.current_temp + "F / " + fToC(p.current_temp) + "C. " + p.description + "; Humidity: " + p.humidity + "%; Wind speed: " + p.windSpeed + " MPH");
+                    }catch(err){
+                    }
+                });
 		}}
 	]
 }

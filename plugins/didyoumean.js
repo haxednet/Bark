@@ -9,6 +9,7 @@ const mod = {
 	onPrivmsg: (e)=>{
         
 		if(e.message.length > 2 && e.message.substr(0,2) == "s/"){
+            if(e.message.slice(-1) != "/") e.message = e.message + "/";
             e.message = e.message.replace(/\\\//g, "--xywebc734md8");
 			ebits = e.message.split("/");
             if(ebits.length == 3) ebits = (e.message + "/").split("/");
@@ -18,13 +19,14 @@ const mod = {
                 ebits[1] = ebits[1].replace(/\-\-xywebc734md8/g, "\\/");
                 ebits[2] = ebits[2].replace(/\-\-xywebc734md8/g, "\\/");
                 ebits[3] = ebits[3].replace(/\-\-xywebc734md8/g, "\\/");
-				if(ebits.length == 4){
+				if(ebits.length > 3){
+                    console.log(ebits[3]);
 					let re = new RegExp(ebits[1], ebits[3]);
 					let tc = cache.map(Array.apply.bind(Array, null));
 					tc.reverse();
 					for(let i in tc){
                         if(tc[i][3].toLowerCase() == e.to.toLowerCase()){
-                            let m = tc[i][1].match(re);
+                            let m = tc[i][1].trim().match(re);
                             if(m != null){
                                 e.reply("<" + tc[i][0] + "> " + tc[i][1].replace(re, ebits[2]));
                                 return;
