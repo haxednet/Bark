@@ -1,0 +1,16 @@
+{
+    "duckgoose": {
+        "karma": 5,
+        "plus": 10,
+        "minus": -5,
+        "i": 2,
+        "-": -7,
+        "t": 1,
+        "+": 2
+    },
+    "bark": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0
+    }
+}
