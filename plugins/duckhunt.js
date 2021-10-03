@@ -1,7 +1,7 @@
 ﻿const fs = require('fs');
 const stats = {};
 
-const duckMessages = ["・ ​ ゜゜・。。・゜゜\_•< QWACK​!","・ ​ ゜゜・。。・゜゜\_0​< QUACK​!","・゜゜ ​ ・。。・゜゜\_o​< Q​UACK!","・゜゜・。 ​ 。・゜゜\_ö<​ FLAP FLAP​!","・゜ ​ ゜・。。・゜゜\​_ó< FLAP ​FLAP!"];
+const duckMessages = ["・ ​ ゜゜・。。・゜゜\\_•< QWACK​!","・ ​ ゜゜・。。・゜゜\\_0​< QUACK​!","・゜゜ ​ ・。。・゜゜\\_o​< Q​UACK!","・゜゜・。 ​ 。・゜゜\\_ö<​ FLAP FLAP​!","・゜ ​ ゜・。。・゜゜\\​_ó< FLAP ​FLAP!"];
 
 const channelSettings = {
 
@@ -109,14 +109,19 @@ function addChannelSettings(e){
 
 function bef(e){
     if(channelSettings[e.to.toLowerCase()] && channelSettings[e.to.toLowerCase()].active){
-        let friends = getFriends(e.username);
-        friends++;
-        setFriends(e.username, friends);
-        channelSettings[e.to.toLowerCase()].active = false;
-        saveAll();
-        return e.reply("(" + e.from.nick + ") You've befriended a duck in " + ((Date.now()-channelSettings[e.to.toLowerCase()].lastDuck) / 1000) + " seconds! Your duck army has grown to " + getFriends(e.username) + " bird(s)");
+        if(rand(1,4) == 1){
+            return e.reply(e.from.nick + ": You tried befriending a duck, but it refused :( Maybe try again");
+        }else{
+            let friends = getFriends(e.username);
+            friends++;
+            setFriends(e.username, friends);
+            channelSettings[e.to.toLowerCase()].active = false;
+            saveAll();
+            return e.reply(e.from.nick + ": You've befriended a duck in " + ((Date.now()-channelSettings[e.to.toLowerCase()].lastDuck) / 1000) + " seconds! Your duck army has grown to " + getFriends(e.username) + " bird(s)");
+        }
+
     }else{
-        e.reply("(" + e.from.nick + ") You tried befriending a non-existent duck. That's nice of you!");
+        e.reply(e.from.nick + ": You tried befriending a non-existent duck. That's nice of you!");
         return true;
     }
 }
@@ -124,14 +129,18 @@ function bef(e){
 
 function bang(e){
     if(channelSettings[e.to.toLowerCase()] && channelSettings[e.to.toLowerCase()].active){
-        let kills = getKills(e.username);
-        kills++;
-        setKills(e.username, kills);
-        channelSettings[e.to.toLowerCase()].active = false;
-        saveAll();
-        return e.reply("(" + e.from.nick + ") You've shot a duck in " + ((Date.now()-channelSettings[e.to.toLowerCase()].lastDuck) / 1000) + " seconds!  You've killed " + getKills(e.username) + " bird(s) so far. Don't let their friends find out!");
+        if(rand(1,4) == 1){
+            return e.reply(e.from.nick + ":  You shot at the duck, but missed. Try again.");
+        }else{
+            let kills = getKills(e.username);
+            kills++;
+            setKills(e.username, kills);
+            channelSettings[e.to.toLowerCase()].active = false;
+            saveAll();
+            return e.reply(e.from.nick + ": You've shot a duck in " + ((Date.now()-channelSettings[e.to.toLowerCase()].lastDuck) / 1000) + " seconds!  You've killed " + getKills(e.username) + " bird(s) so far. Don't let their friends find out!");
+        }
     }else{
-        return e.reply("(" + e.from.nick + ")  There is no duck. What are you shooting at?");
+        return e.reply(e.from.nick + ":  There is no duck. What are you shooting at?");
     }
 }
 
@@ -148,10 +157,10 @@ function bribe(e){
                 return e.reply("(" + e.from.nick + ")  The duck refused");
             }
         }else{
-            return e.reply("(" + e.from.nick + ")  Bribe was used recently. Please wait longer for the ducks to forget");
+            return e.reply(e.from.nick + ":  Bribe was used recently. Please wait longer for the ducks to forget");
         }
     }else{
-        return e.reply("(" + e.from.nick + ")  There's no active hunt in this channel");
+        return e.reply(e.from.nick + ":  There's no active hunt in this channel");
     }
     
     

@@ -11,7 +11,7 @@ const categories = {
 
 const mod = {
 	commands: [
-		{command: "karma", enabled: true, hidden: false, usage: "$whois <nick> -- Gets username tracking information for a given nick", callback: (e)=>{
+		{command: "karma", enabled: true, hidden: false, usage: "$karma <nick> -- Gets karma count for a given nick", callback: (e)=>{
             if(e.args.length < 2) return e.reply("ERROR: not enough parameters");
             if(p.whoCache[e.args[1].toLowerCase()] == undefined){
                 return e.reply(e.args[1] + " has no score");
@@ -27,13 +27,14 @@ const mod = {
     },
     
     onPrivmsg: (e)=>{
+        e.message = e.message.replace("—", "--");
         try{
             if(e.args.length == 1){
                 for(let i in categories){
                     if(e.message.slice(-2) == "+" + i || e.message.slice(-2) == "++"){
                         const nick = e.message.split("+")[0];
                         const username = p.whoCache[nick.toLowerCase()];
-                        if(username == undefined) return e.reply(nick + " is not identified or not in the channel");
+                        if(username == undefined) return;
                         if(nick.toLowerCase() == e.from.nick.toLowerCase() || e.username == username[0]) return e.reply("Nice try " + nick);
                         addScore(username[0], e.message.slice(-1));
                         return e.reply(getScore(nick, username[0]));
@@ -41,7 +42,7 @@ const mod = {
                     if(e.message.slice(-2) == "-" + i || e.message.slice(-2) == "--"){
                         const nick = e.message.split("-")[0];
                         const username = p.whoCache[nick.toLowerCase()];
-                        if(username == undefined) return e.reply(nick + " is not identified or not in the channel");
+                        if(username == undefined) return;
                         if(nick.toLowerCase() == e.from.nick.toLowerCase() || e.username == username[0]) return e.reply("Nice try " + nick);
                         minusScore(username[0], e.message.slice(-1));
                         return e.reply(getScore(nick, username[0]));

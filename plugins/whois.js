@@ -22,6 +22,27 @@ const mod = {
                     return e.reply(replyStr);
                 }
             }
+		}},
+		{command: "whoami", enabled: true, hidden: true, usage: "$whois <nick> -- Gets username tracking information for a given nick", callback: (e)=>{
+            e.args[1] = e.from.nick;
+            if(p.whoCache[e.args[1].toLowerCase()] == undefined){
+                return e.reply(e.args[1] + " wasn't found!");
+            }else{
+                const wu = p.whoCache[e.args[1].toLowerCase()];
+                let replyStr = "";
+                if(wu[2]){
+                    replyStr = e.args[1] + " is identified as " + wu[0];
+                    replyStr += ", and their host is " + wu[1];
+                    if(e.isAdmin(wu[1], e.to.toLowerCase())) replyStr += ", and they're an admin";
+                    console.log(e.admin);
+                    return e.reply(replyStr);
+                }else{
+                    replyStr = e.args[1] + " is not identified";
+                    replyStr += ", and their host is " + wu[1];
+                    if(e.isAdmin(wu[1], e.to.toLowerCase())) replyStr += ", and they're an admin";
+                    return e.reply(replyStr);
+                }
+            }
 		}}
 	],
     

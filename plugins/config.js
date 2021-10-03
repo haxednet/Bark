@@ -29,8 +29,12 @@ const plugin = {
                     if(e.chanConfig[e.args[2]]){
                         if(typeof(e.chanConfig[e.args[2]])){
                             //e.chanConfig[e.args[2]].push();
-                            e.chanConfig[e.args[2]].push(JSON.parse(str));
-                            return e.reply("operation completed successfully");
+                            try{
+                                e.chanConfig[e.args[2]].push(JSON.parse(str));
+                                return e.reply("operation completed successfully");
+                            }catch(err){
+                                return e.reply("operation unsuccessful: " + err.message);
+                            }
                         }else{
                             return e.reply("item is not an array");
                         }
@@ -44,17 +48,21 @@ const plugin = {
                     if(e.chanConfig[e.args[2]]){
                         if(typeof(e.chanConfig[e.args[2]]) == "object"){
                             //e.chanConfig[e.args[2]].push();
-                            if(Array.isArray(e.chanConfig[e.args[2]])){
-                                for(let i in e.chanConfig[e.args[2]]){
-                                    if(e.chanConfig[e.args[2]][i] == JSON.parse(str)){
-                                        e.chanConfig[e.args[2]].splice(i, 1);
-                                        break;
+                            try{
+                                if(Array.isArray(e.chanConfig[e.args[2]])){
+                                    for(let i in e.chanConfig[e.args[2]]){
+                                        if(e.chanConfig[e.args[2]][i] == JSON.parse(str)){
+                                            e.chanConfig[e.args[2]].splice(i, 1);
+                                            break;
+                                        }
                                     }
+                                }else{
+                                    delete(e.chanConfig[e.args[2]][JSON.parse(str)]);
                                 }
-                            }else{
-                                delete(e.chanConfig[e.args[2]][JSON.parse(str)]);
+                                 return e.reply("operation completed successfully");
+                            }catch(err){
+                                return e.reply("operation unsuccessful: " + err.message);
                             }
-                             return e.reply("operation completed successfully");
                         }else{
                             return e.reply("item is not an array");
                         }

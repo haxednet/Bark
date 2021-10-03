@@ -6,14 +6,18 @@ const mod = {
             if(e.input.replace(/\s/g, "") == "") return;
 			request('http://api.urbandictionary.com/v0/define?term=' + e._input, (error, response, body)=>{
 				if(error){
-					e.reply("Error :(");
+					return e.reply("Error :(");
 				}else{
+                    try{
 					const J = JSON.parse(body);
 					if(J.list.length == 0){
-						e.reply("Nothing found for " + e.input);
+						return e.reply("Nothing found for " + e.input);
 					}else{
-						e.reply("" + e._input + ": " + J.list[0].definition);
+						return e.reply("" + e._input + ": " + J.list[0].definition);
 					}
+                    }catch(err){
+                        return e.reply("Error :(");
+                    }
 				}
 			});
 		}}

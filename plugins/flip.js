@@ -55,12 +55,15 @@ const mod = {
 					}
 					if(didReplace == false) fText += input[a];
 				}
-				e.reply(flip + " " + fText);
+				e.reply(flip + " " + reverse(fText));
 			}
 		}}
 	]
 }
 
+function reverse(s){
+    return s.split("").reverse().join("");
+}
 
 function rand(min, max) {
 	return Math.floor(min + Math.random()*(max + 1 - min))

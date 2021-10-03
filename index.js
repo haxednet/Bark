@@ -1,3 +1,10 @@
+process.on('uncaughtException', function (err) {
+  // This should not happen
+  console.log(err);
+  process.exit(1);
+});
+
+
 /* ENUMERATORS \o/ */
 const PERMISSION_ERROR = "Elevated privileges required for command $com";
 const NOT_ENOUGH_ARGS = "Not enough arguments for command $com";
@@ -217,6 +224,13 @@ bot.on('notice', (e) => {
 bot.on('privmsg', (e) => {
     //console.log(e);
     
+    if(e.to.substr(0,1).match(/\+|\@/) != null){
+        e.to = e.to.substr(1);
+    }
+        
+    
+    if(e.message.substr(0,2) == config.globalSettings.commandPrefix + " ") return;
+    
     /* allow commands in PMs */
     if(e.to.substr(0,1) != "#"){
         if(e.message.substr(0,1) == "#"){
@@ -343,9 +357,14 @@ bot.on('privmsg', (e) => {
                 if(!isAdmin(e.from.mask)) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
                 bot.sendData(e.message.split(".raw ")[1]);
                 break;
-                
-            case "save":
+ 
+            case "kill":
                 if(!isAdmin(e.from.mask)) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
+                process.exit(1);
+                break;
+ 
+            case "save":
+                if(!e.admin) return e.reply(PERMISSION_ERROR.replace(/\$com/g, e.command));
                 if(fs.existsSync('config.json.bak')) fs.unlinkSync("config.json.bak");
                 fs.rename('config.json', 'config.json.bak', (err) => {
                     fs.writeFile("config.json", JSON.stringify(config, null, 4), function(err) {
@@ -474,7 +493,9 @@ bot.on('privmsg', (e) => {
     }
     
     for(let i in plugins){
-        if(plugins[i].onPrivmsg) plugins[i].onPrivmsg(e);
+        if(plugins[i].onPrivmsg){
+            if(plugins[i].onPrivmsg(e)) return;
+        }
     }
 });
 
@@ -506,15 +527,21 @@ function userAsRegex( e ){
 	}
 	returnStr = returnStr.replace( /\s/g, "\\s" );
 	returnStr = returnStr.replace( /\*/g, "(.*)" );
-	return new RegExp(returnStr, "ig");
+	return new RegExp("^" + returnStr + "$", "ig");
 }
 
 function httpGet(e, callback){
+    
     let httpo = http;
     if(e.substr(0,5) == "https") httpo = https;
-    const host = e.split("/")[2];
+    const host = e.split("/")[2].split(":")[0];
+    let port = 80;
+    if(e.indexOf("https://") > -1) port = 443;
+    if(e.split("/")[2].indexOf(":") > -1) port = e.split("/")[2].split(":")[1];
+    console.log(host);
     const options ={
         host: host,
+        port: port,
         path: e.substr(e.indexOf("://" + host) + host + 3)
     };
     const cb = function(response) {
@@ -530,8 +557,12 @@ function httpGet(e, callback){
             callback(str);
         });
     }
-    httpo.request(options, cb).end();
+    try{
+        httpo.request(options, cb).end();
+    }catch(e){
+    }
 }
+
 
 
 function dataStore(a,b){

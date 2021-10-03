@@ -39,7 +39,7 @@ class irc extends EventEmitter {
                 myself.client.write(myself.sendCache[0] + "\r\n");
                 myself.sendCache.splice(0, 1);
             }
-        },400);
+        },1000);
 		/*
 			if this.config.ssl is true then we need to make a TLS socket, otherwise we
 			a simple TCP socket.
@@ -265,9 +265,17 @@ class irc extends EventEmitter {
 		}
 		
 		function sendReply(channel, type, message, ms){
+            if(message.toLowerCase().indexOf(String.fromCharCode(1)) > -1 && message.toLowerCase().indexOf(String.fromCharCode(1) + "action") < 0) return;
             channel = channel.replace(":","");
 			if(channel.substr(0,1)!="#") channel = parseUser(channel).nick;
-			ms.sendData(type + " " + channel + " :" + message);
+            
+            const replies = splitByNum(message, 450);
+            if(replies > 3) return;
+            
+            for(let i in replies){
+                ms.sendData(type + " " + channel + " :" + replies[i]);
+                if(i > 10) return;
+            }
 		}
 		
 		function parseUser(e){
@@ -281,8 +289,8 @@ class irc extends EventEmitter {
 		log(e);
         
 		try{
+            
             if(e.toLowerCase().indexOf("privmsg") > -1){
-                if(this.sendCache.length > 7) return;
                 this.sendCache.push(e);
             }else{
                 this.client.write( e + "\r\n" );
@@ -349,6 +357,15 @@ class irc extends EventEmitter {
 	}
 }
 
+function splitByNum(str, num){
+    const res = [];
+    if(str.length <= num) return [str];
+    while(str.length > 0){
+        res.push(str.substr(0,num));
+        str = str.substr(num);
+    }
+    return res;
+}
 
 function log(e){
 	if(logging) console.log(e);

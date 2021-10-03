@@ -6,6 +6,7 @@ const plugin = {
 		try{
             for(let i in bits){
                 if(bits[i].match(urlR) != null){
+                    bits[i] = bits[i].replace("view-source:","");
                     const yt = youtube(bits[i]);
                     if(yt){
                         console.log(yt);
@@ -78,7 +79,11 @@ function decodeHTMLEntities(text) {
         ['lt', '<'],
         ['gt', '>'],
         ['nbsp', ' '],
-        ['quot', '"']
+        ['quot', '"'],
+        ['mdash', '-'],
+        ['dash', '-'],
+        ['#038', '"'],
+        ['#38', '"']
     ];
 
     for (var i = 0, max = entities.length; i < max; ++i) 

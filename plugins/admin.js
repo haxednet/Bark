@@ -8,14 +8,16 @@
             switch(e.args[1].toLowerCase()){
                 case "ban":
                     if(e.args.length < 3) return e.reply("Not enough arguments! " + prefix + "admin ban user");
-                    e.ban(e.args[2]);
+                    e.ban(e.channel, e.args[2]);
+                    const banMessage = e.message.substr(e.args[0].length + e.args[1].length + e.args[2].length + 4);
+                    e.bot.sendData("KICK " + e.channel + " " + e.args[2] + " :" + banMessage);
                     break;
 
                 case "unban":
                     if(e.args.length < 3) return e.reply("Not enough arguments! " + prefix + "admin unban mask");
                     if(e.whoCache[e.args[2].toLowerCase()]){
                         let userHost = e.whoCache[e.args[2].toLowerCase()][1];
-                        e.bot.sendData("MODE " + e.channel + " -bb *!*@" + userHost.split("@")[1] + " " + e.args[2]);
+                        e.bot.sendData("MODE " + e.channel + " -bb *!" + userHost.split(/!|@/)[1] + "@" + userHost.split("@")[1] + " " + e.args[2]);
                     }else{
                         e.bot.sendData("MODE " + e.channel + " -b " + e.args[2]);
                     }

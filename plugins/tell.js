@@ -11,6 +11,7 @@ const mod = {
 				if(tells[i][0].toLowerCase() == e.args[1].toLowerCase()) ncount++;
 			}
 			if(ncount>2) return e.reply("Sorry, I already have too much to tell " + e.args[1]);
+            if(e.args[1].toLowerCase() == "duckgoose" && ncount > 0) return e.reply("Sorry, I already have too much to tell " + e.args[1]);
 			tells.push([e.args[1].toLowerCase(),"<" + e.from.nick + "> [" + e.from.mask + "] " + e.message]);
 
 			return e.reply("Ok I'll tell " + e.args[1] + " you've said this");

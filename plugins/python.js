@@ -23,7 +23,7 @@ const mod = {
                                 if(parts[i].length > 0 && count < 3){
                                     count++;
                                     if(parts[i].length > 1000) return e.reply("that output is too damn big to print!!");
-                                    if(parts[i].toLowerCase().indexOf("dcc")>-1) return e.reply("Nope");
+                                    if(parts[i].toLowerCase().indexOf("")>-1) return e.reply("Error: Attempted use of CTCP char!");
                                     e.reply(decodeHTMLEntities(parts[i]));
                                 }
                             }

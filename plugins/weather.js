@@ -13,7 +13,7 @@ const mod = {
                         const loc = a.data.metadata.cookies[0].value;
                         const p = a.data.response.weather.current;
 
-                        return e.reply("Weather for " + loc.locality + ", " + loc.adminDistrict + ", " + loc.country + ": " + p.current_temp + "F / " + fToC(p.current_temp) + "C. " + p.description + "; Humidity: " + p.humidity + "%; Wind speed: " + p.windSpeed + " MPH");
+                        return e.reply("Weather for " + loc.locality + ", " + loc.adminDistrict + ", " + loc.country + ": " + p.current_temp + "F / " + fToC(p.current_temp) + "C. " + p.description + "; Humidity: " + p.humidity + "%; Wind speed: " + p.windSpeed + " MPH / " + (Math.round((parseInt(p.windSpeed) * 0.868976) * 10) / 10) + " KNOTS");
                     }catch(err){
                     }
                 });
@@ -31,6 +31,8 @@ function cToF(celsius) {
   const cToFahr = cTemp * 9 / 5 + 32;
   return parseInt(cToFahr);
 }
+
+
 
 function fToC(fahrenheit) {
   const fTemp = parseInt(fahrenheit);
