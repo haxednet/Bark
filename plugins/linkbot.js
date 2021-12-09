@@ -25,7 +25,9 @@ const plugin = {
                                 const d = JSON.parse(a);
                                 if(d["c-type"] == "text/html" || d["c-type"] == undefined){
                                     if(d.title != undefined){
-                                        return e.reply("Title: " + decodeHTMLEntities(d.title) + "");
+                                        let dtitle = decodeHTMLEntities(d.title);
+                                        dtitle = dtitle.replace(/(\r\n|\n|\r)/igm,"");
+                                        return e.reply("Title: " + dtitle + "");
                                     }
                                 }else{
                                     if(d["c-type"]!= undefined){
