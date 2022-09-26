@@ -55,7 +55,11 @@ const mod = {
 					}
 					if(didReplace == false) fText += input[a];
 				}
-				return e.reply(flip + " " + reverse(fText));
+				if(input == "table"){
+					return e.reply(flip + " ┻━┻");
+				}else{
+					return e.reply(flip + " " + reverse(fText));
+				}
 			}
 		}}
 	]
