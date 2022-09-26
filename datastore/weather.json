@@ -1,0 +1,141 @@
+{
+    "duckgoose": {
+        "woeid": 12769814,
+        "centroid_latitude": 36.167511,
+        "centroid_longitude": -81.078651,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "North Carolina",
+        "admin2_name": "Wilkes",
+        "display_name": "North Wilkesboro",
+        "full_display_name": "North Wilkesboro, NC, US"
+    },
+    "Time-Warp": {
+        "woeid": 2487956,
+        "centroid_latitude": 37.747398,
+        "centroid_longitude": -122.439217,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "California",
+        "admin2_name": "San Francisco",
+        "display_name": "San Francisco",
+        "full_display_name": "San Francisco, CA, US"
+    },
+    "coil": {
+        "woeid": 12587808,
+        "centroid_latitude": 26.145741,
+        "centroid_longitude": -80.477531,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Florida",
+        "display_name": "Broward",
+        "full_display_name": "Broward, FL, US"
+    },
+    "aqsd": {
+        "woeid": 12761303,
+        "centroid_latitude": 40.568729,
+        "centroid_longitude": -74.737953,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "New Jersey",
+        "display_name": "Readington",
+        "full_display_name": "Readington, NJ, US"
+    },
+    "maverick": {
+        "woeid": 742676,
+        "centroid_latitude": 38.72567,
+        "centroid_longitude": -9.15037,
+        "country_name": "Portugal",
+        "country_code": "PT",
+        "admin1_name": "Lisbon",
+        "admin2_name": "Lisbon",
+        "display_name": "Lisbon",
+        "full_display_name": "Lisbon, Lisbon, PT"
+    },
+    "portalrat": {
+        "woeid": 568568,
+        "centroid_latitude": 65.0103,
+        "centroid_longitude": 25.473499,
+        "country_name": "Finland",
+        "country_code": "FI",
+        "admin1_name": "Northern Ostrobothnia",
+        "admin2_name": "Oulun",
+        "display_name": "Oulu",
+        "full_display_name": "Oulu, Northern Ostrobothnia, FI"
+    },
+    "notZigggy": {
+        "woeid": 12760608,
+        "centroid_latitude": 40.821991,
+        "centroid_longitude": -73.988037,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "New Jersey",
+        "admin2_name": "Bergen",
+        "display_name": "Cliffside Park",
+        "full_display_name": "Cliffside Park, NJ, US"
+    },
+    "allicat": {
+        "woeid": 12777751,
+        "centroid_latitude": 41.459702,
+        "centroid_longitude": -86.998718,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Indiana",
+        "display_name": "Valparaiso",
+        "full_display_name": "Valparaiso, IN, US"
+    },
+    "money": {
+        "woeid": 12765455,
+        "centroid_latitude": 40.141701,
+        "centroid_longitude": -74.856697,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Pennsylvania",
+        "admin2_name": "Bucks",
+        "display_name": "Levittown",
+        "full_display_name": "Levittown, PA, US"
+    },
+    "eskimo": {
+        "woeid": 2372709,
+        "centroid_latitude": 40.832329,
+        "centroid_longitude": -75.005859,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "New Jersey",
+        "admin2_name": "Warren",
+        "display_name": "Buttzville",
+        "full_display_name": "Buttzville, NJ, US"
+    },
+    "DetectiveTaco": {
+        "woeid": 2476684,
+        "centroid_latitude": 38.54398,
+        "centroid_longitude": -76.587929,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Maryland",
+        "admin2_name": "Calvert",
+        "display_name": "Prince Frederick",
+        "full_display_name": "Prince Frederick, MD, US"
+    },
+    "polo": {
+        "woeid": 12765446,
+        "centroid_latitude": 40.18116,
+        "centroid_longitude": -74.909973,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Pennsylvania",
+        "admin2_name": "Bucks",
+        "display_name": "Langhorne",
+        "full_display_name": "Langhorne, PA, US"
+    },
+    "zyme": {
+        "woeid": 12799569,
+        "centroid_latitude": 46.076569,
+        "centroid_longitude": -119.089958,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Washington",
+        "display_name": "Kennewick",
+        "full_display_name": "Kennewick, WA, US"
+    }
+}

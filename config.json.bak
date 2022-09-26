@@ -1,0 +1,319 @@
+{
+    "bot": {
+        "host": "irc.libera.chat",
+        "port": 6697,
+        "ssl": true,
+        "nick": "Bark",
+        "auth": {
+            "type": "sasl_plain",
+            "user": "bark",
+            "password": "sdfhg8934ht94dfsw4"
+        },
+        "ident": "bot",
+        "realName": "simple-irc bot"
+    },
+    "globalSettings": {
+        "botMasters": [
+            "*!*@user/duckgoose",
+            "*!*@user/zyme",
+            "*!*@user/Hoffmann"
+        ],
+        "commandPrefix": "."
+    },
+    "channels": {
+        "##defocus": {
+            "ccomWhitelist": false,
+            "admins": [
+                "*!*@user/duckgoose",
+                "*!*@user/ctrlaltdev",
+                "*!*@fedora/ansible.user.nb",
+                "*!*@user/kindone",
+                "*!*@user/zyme",
+                "*!*@offtopia/nomad",
+                "*!*@207.148.24.107",
+                "*!*@gateway/tor-sasl/hoffmann",
+                "*!*@about/windows/staff/blkshp",
+                "*!*@user/mwsb",
+                "*!*@user/aqsd",
+                "*!*@sourcehut/user/noisytoot",
+                "*!*@idlerpg/player/kindone"
+            ],
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                "portalrat"
+            ],
+            "kickWords": [],
+            "banWords": [],
+            "autoOp": [],
+            "ignore": [
+                "LitBot!*@*",
+                "*!*@2a00:20:3057:7250:*"
+            ],
+            "banChannelNotices": true,
+            "opOnJoin": true,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": true,
+            "animalList": [
+                "squirrels",
+                "Ducks"
+            ],
+            "ccomSendLimit": 4,
+            "zyme": "SUS",
+            "yiff": "ew wtf",
+            "notZigggy": "mean",
+            "AllowFruitPlate": false,
+            "topicCache": "DUCK AT LARGE! | Welcome to ##defocus, we don't talk about ##Llamas -- <+duckgoose> no ferret | We are a duck-themed channel. duckgoose is the resident duck. He loves bread. | duckgoose's government name is Duck Gluckman | <duckgoose> ferret season! <ferret> duck season! | ferret's family spotted: https://0x0.st/o1kY.png"
+        },
+        "##foxx": {
+            "admins": [
+                "*!*@user/duckgoose",
+                "*!*@user/zyme"
+            ],
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                "roast"
+            ],
+            "kickWords": [
+                "roasted duck"
+            ],
+            "banWords": [
+                "nigger",
+                "faggot"
+            ],
+            "autoOp": [],
+            "ignore": [
+                "hello-smile6!*@*"
+            ],
+            "banChannelNotices": true,
+            "opOnJoin": true,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": true,
+            "ccomSendLimit": 10
+        },
+        "#": {
+            "admins": [
+                "*!*@user/duckgoose"
+            ],
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                "roast"
+            ],
+            "kickWords": [
+                "roasted duck"
+            ],
+            "banWords": [
+                "nigger",
+                "faggot"
+            ],
+            "autoOp": [],
+            "ignore": [],
+            "banChannelNotices": true,
+            "opOnJoin": false,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": false
+        },
+        "##fitness": {
+            "admins": [
+                "*!*@user/duckgoose",
+                "user/zyme",
+                "user/xx",
+                "user/Hoffmann"
+            ],
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                "roast"
+            ],
+            "kickWords": [],
+            "banWords": [],
+            "autoOp": [],
+            "ignore": [],
+            "banChannelNotices": true,
+            "opOnJoin": false,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": false
+        },
+        "#game-factory": {
+            "admins": [
+                "*!*@user/duckgoose",
+                "user/zyme",
+                "*!*@user/zyme"
+            ],
+            "disableCcoms": false,
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                "bark"
+            ],
+            "kickWords": [
+                "roasted duck"
+            ],
+            "banWords": [
+                "nigger",
+                "faggot"
+            ],
+            "autoOp": [],
+            "ignore": [],
+            "banChannelNotices": true,
+            "opOnJoin": false,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": false,
+            "ccomWhitelist": false,
+            "ccomSendLimit": 3
+        },
+        "##logcabin": {
+            "admins": [
+                "*!*@user/duckgoose"
+            ],
+            "disableCcoms": true,
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                ".bef",
+                ".start",
+                ".bang",
+                ".help",
+                ".tell"
+            ],
+            "kickWords": [],
+            "banWords": [],
+            "autoOp": [],
+            "ignore": [],
+            "banChannelNotices": true,
+            "opOnJoin": false,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": false,
+            "ccomWhitelist": false,
+            "ccomSendLimit": 3
+        },
+        "##feelings": {
+            "admins": [
+                "*!*@user/duckgoose"
+            ],
+            "disableCcoms": false,
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [],
+            "kickWords": [],
+            "banWords": [],
+            "autoOp": [],
+            "ignore": [],
+            "banChannelNotices": true,
+            "opOnJoin": false,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": false,
+            "ccomWhitelist": false,
+            "ccomSendLimit": 3
+        },
+        "##general": {
+            "admins": [
+                "*!*@user/duckgoose",
+                "*!*@cyberia.club/member/nyaaori",
+                "Nyaaori[PTF]!~nyaaoripi@2001:470:69fc:105::f590",
+                "*!*@user/zyme"
+            ],
+            "disableCcoms": false,
+            "disallowedCommands": [
+                "loop"
+            ],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                "bark"
+            ],
+            "kickWords": [
+                "roasted duck"
+            ],
+            "banWords": [
+                "nigger",
+                "faggot"
+            ],
+            "autoOp": [],
+            "ignore": [],
+            "banChannelNotices": true,
+            "opOnJoin": false,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": false,
+            "ccomWhitelist": [
+                "user/rber",
+                "user/nekobit",
+                "sourcehut/user/noisytoot",
+                "cyberia.club/member/nyaaori",
+                "user/zyme"
+            ],
+            "ccomSendLimit": 3,
+            "coolPeople": [
+                "Nyaa"
+            ]
+        },
+        "##nyaa": {
+            "admins": [
+                "*!*@user/duckgoose"
+            ],
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                "bark"
+            ],
+            "kickWords": [
+                "roasted duck"
+            ],
+            "banWords": [
+                "nigger",
+                "faggot"
+            ],
+            "autoOp": [],
+            "ignore": [],
+            "banChannelNotices": true,
+            "opOnJoin": false,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": false,
+            "ccomWhitelist": [
+                "user/nyaaori",
+                "user/nekobit",
+                "user/rber"
+            ]
+        },
+        "##news-chat": {
+            "admins": [
+                "*!*@user/duckgoose",
+                "*!*@ircpuzzles/staff/yano"
+            ],
+            "disallowedCommands": [],
+            "disallowedPlugins": [],
+            "bannedParams": [
+                "bark"
+            ],
+            "kickWords": [
+                "roasted duck"
+            ],
+            "banWords": [
+                "nigger",
+                "faggot"
+            ],
+            "autoOp": [],
+            "ignore": [],
+            "banChannelNotices": true,
+            "opOnJoin": false,
+            "autoRejoin": true,
+            "allowCommandsInPM": true,
+            "duckhunt": false,
+            "ccomWhitelist": [
+                "user/nyaaori",
+                "user/nekobit",
+                "user/rber"
+            ]
+        }
+    }
+}

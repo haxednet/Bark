@@ -55,7 +55,7 @@ const mod = {
 					}
 					if(didReplace == false) fText += input[a];
 				}
-				e.reply(flip + " " + reverse(fText));
+				return e.reply(flip + " " + reverse(fText));
 			}
 		}}
 	]

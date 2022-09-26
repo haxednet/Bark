@@ -71,12 +71,29 @@ for(let i in plugins){
    plugins[i].keys = keys;
 }
 
+let opTimer = 0;
 bot.on('data', (e) => {
     const args = e.split(" ");
     let nick = "";
-    console.log(e);
+	console.log(e);
+	
     switch(args[1]){
         
+		case "MODE":
+			const chanConfig = config.channels[args[2]];
+			if(e.toLowerCase().indexOf("+o time-warp") > 1 && chanConfig && chanConfig.deopTimewarp){
+				bot.sendData("MODE ##defocus -o time-warp");
+			}
+			if(e.toLowerCase().indexOf("-o bark") > 1 && e.toLowerCase().indexOf("##defocus") > 1){
+				clearTimeout(opTimer);
+				opTimer = setTimeout(function(){
+					bot.sendData("PRIVMSG ChanServ :op ##defocus bark");
+					bot.sendData("PRIVMSG ##defocus :Don't do that.");					
+				},2000);
+
+			}
+			break;
+		
         case "ACCOUNT":
             nick = args[0].substr(1).split("!")[0].toLowerCase();
             if(whoCache[nick] != undefined && args[2] != "*"){
@@ -85,11 +102,15 @@ bot.on('data', (e) => {
             break;
             
         case "NICK":
+
             nick = args[0].substr(1).split("!")[0].toLowerCase();
+
             if(whoCache[nick] != undefined){
-                whoCache[args[2].toLowerCase()] = whoCache[nick];
+				whoCache[nick][1] = args[2].replace(":", "") + "!" + whoCache[nick][1].split("!")[1];
+                whoCache[args[2].replace(":", "")] = whoCache[nick];
                 delete whoCache[nick];
             }
+
             break;
     }
     for(let i in plugins){
@@ -148,6 +169,7 @@ bot.on('kick', (e) => {
         }
     }
 });
+
 
 bot.on('numeric', (e) => {
     const args = e.data.split(" ");
@@ -250,7 +272,7 @@ bot.on('privmsg', (e) => {
     if(e.isPM == false){
         /* chatLog is a small log of chat messages for diagnostic usage */
         chatLog.push([Date.now(), e.from.mask, e.to, e.message]);
-        if(chatLog.length > 1024) chatLog.splice(0,1);
+        if(chatLog.length > 10240) chatLog.splice(0,1);
     }
     
     const input = e.message.substr(1).replace(/\s\s/g, " ").trim();
@@ -290,7 +312,6 @@ bot.on('privmsg', (e) => {
         if(e.message.toLowerCase().indexOf(chanConfig.bannedParams[i].toLowerCase()) > -1 && !e.admin) return;
         if(homoglyph.stringify(e.message.toLowerCase()).indexOf(chanConfig.bannedParams[i].toLowerCase()) > -1 && !e.admin) return;
     }
-    
     /* check for ban words and kick words if they're not admin */
     if(chanConfig && !e.admin){
         for(let i in chanConfig.kickWords){
@@ -324,6 +345,8 @@ bot.on('privmsg', (e) => {
     /* Below is the main functionality for commands */
     if(e.message.substr(0,1) == config.globalSettings.commandPrefix){
         
+		//fs.appendFileSync("ccom.log", Date.now() + " " + e.to + " " + e.from.mask + ": " + e.message + "\r\n");
+		
         switch(e.command){
             
             case "ignore":
@@ -555,6 +578,9 @@ function httpGet(e, callback){
         //the whole response has been received, so we just print it out here
         response.on('end', function () {
             callback(str);
+        });
+        response.on('error', function (e) {
+
         });
     }
     try{

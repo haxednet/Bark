@@ -6,3 +6,4 @@ package-lock.json
 apiKeys.json
 config.json
 zccom.js
+ccom.log

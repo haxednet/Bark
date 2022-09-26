@@ -60,14 +60,14 @@ const mod = {
             if(e.admin != true) return;
             let kills = getKills("time-warp");
             kills++;
-            setKills("time-warp", kills);
+            setKills("ferret", kills);
             return e.reply(">_>");
 		}},
 		{command: "removebangedduck", enabled: true, hidden: true, usage: "Don't use this", callback: (e)=>{
             if(e.admin != true) return;
             let kills = getKills("time-warp");
             kills--;
-            setKills("time-warp", kills);
+            setKills("ferret", kills);
             return e.reply("<_<");
 		}},
 		{command: "merge", enabled: true, hidden: true, usage: "Don't use this", callback: (e)=>{

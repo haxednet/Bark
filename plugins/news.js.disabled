@@ -1,0 +1,27 @@
+const plugin = {
+    commands:[],
+	bot: null,
+	httpGet: null,
+	init: (e)=>{
+		this.bot = e.bot;
+		plugin.httpGet = e.httpGet;
+		start();
+	}
+}
+
+let last = "";
+
+function start(){
+	setInterval(function(){
+		plugin.httpGet("http://api2.haxed.net/news", (a)=>{
+			if(a == "0") return;
+			if(a == last) return;
+			if(a.length && a.length < 4) return;
+			last = a;
+			plugin.bot.sendData("PRIVMSG ##defocus :Breaking News: " + a );
+			
+		});
+	},900000);
+}
+
+module.exports= plugin;

@@ -13,7 +13,7 @@ const mod = {
 					if(J.list.length == 0){
 						return e.reply("Nothing found for " + e.input);
 					}else{
-						return e.reply("" + e._input + ": " + J.list[0].definition);
+						return e.reply("" + e._input + ": " + J.list[0].definition.split("\r\n")[0]);
 					}
                     }catch(err){
                         return e.reply("Error :(");

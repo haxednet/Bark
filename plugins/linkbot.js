@@ -1,11 +1,31 @@
 const plugin = {
     commands:[],
     onPrivmsg: (e)=>{
+		e.message = e.message.replace("youtube.com/shorts/", "youtube.com/watch?v=");
         const urlR = /(http|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/i /* regex to find urls */
         const bits = e.message.split(" ");
+
+		const tweet = twitter(e.message);
+		
+		if(tweet){
+			e.httpGet("https://api2.haxed.net/twitter/" + tweet, (a)=>{
+				console.log(a);
+				try{
+					let j = JSON.parse(a);
+					if(j.html != undefined){
+						e.reply("[2,0Twitter] " + decodeHTMLEntities(j.html.replace(/<[^>]*>?|\r|\n/gm, '')));
+					}
+				}catch(errr){
+				}
+			});
+			return;
+		}
+
+		
 		try{
             for(let i in bits){
                 if(bits[i].match(urlR) != null){
+										
                     bits[i] = bits[i].replace("view-source:","");
                     const yt = youtube(bits[i]);
                     if(yt){
@@ -25,7 +45,10 @@ const plugin = {
                                 const d = JSON.parse(a);
                                 if(d["c-type"] == "text/html" || d["c-type"] == undefined){
                                     if(d.title != undefined){
-                                        return e.reply("Title: " + decodeHTMLEntities(d.title) + "");
+                                        let dtitle = decodeHTMLEntities(d.title);
+                                        dtitle = dtitle.replace(/(\r\n|\n|\r)/igm,"");
+
+                                        return e.reply("Title:  " + dtitle + " ");
                                     }
                                 }else{
                                     if(d["c-type"]!= undefined){
@@ -52,6 +75,12 @@ function youtube(url){
     return (match&&match[1].length==11)? match[1] : false;
 }
 
+function twitter(url){
+    const regExp = /https?\:\/\/twitter.com\/(.*)\/status\/([0-9]{19})/i;
+    const match = url.match(regExp);
+    return (match!=null) ? match[2] : false;
+}
+
 function humanFileSize(bytes, si) {
     let thresh = si ? 1000 : 1024;
     if(Math.abs(bytes) < thresh) {
@@ -69,6 +98,7 @@ function humanFileSize(bytes, si) {
 }
 
 function decodeHTMLEntities(text) {
+	text = parseHtmlEntities(text);
     var entities = [
         ['amp', '&'],
         ['apos', '\''],
@@ -86,10 +116,20 @@ function decodeHTMLEntities(text) {
         ['#38', '"']
     ];
 
+
     for (var i = 0, max = entities.length; i < max; ++i) 
         text = text.replace(new RegExp('&'+entities[i][0]+';', 'g'), entities[i][1]);
 
     return text;
+}
+
+function parseHtmlEntities(str) { 
+    return str.replace(/&#([0-9]{1,4});/gi, function(match, numStr)
+    { 
+        var num = parseInt(numStr, 10); 
+        // read num as normal number 
+        return String.fromCharCode(num); 
+    }); 
 }
 
 module.exports= plugin;
