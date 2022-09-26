@@ -80,18 +80,7 @@ bot.on('data', (e) => {
     switch(args[1]){
         
 		case "MODE":
-			const chanConfig = config.channels[args[2]];
-			if(e.toLowerCase().indexOf("+o time-warp") > 1 && chanConfig && chanConfig.deopTimewarp){
-				bot.sendData("MODE ##defocus -o time-warp");
-			}
-			if(e.toLowerCase().indexOf("-o bark") > 1 && e.toLowerCase().indexOf("##defocus") > 1){
-				clearTimeout(opTimer);
-				opTimer = setTimeout(function(){
-					bot.sendData("PRIVMSG ChanServ :op ##defocus bark");
-					bot.sendData("PRIVMSG ##defocus :Don't do that.");					
-				},2000);
 
-			}
 			break;
 		
         case "ACCOUNT":
