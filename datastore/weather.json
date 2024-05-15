@@ -1,14 +1,14 @@
 {
     "duckgoose": {
-        "woeid": 12769814,
-        "centroid_latitude": 36.167511,
-        "centroid_longitude": -81.078651,
+        "woeid": 2398498,
+        "centroid_latitude": 36.245121,
+        "centroid_longitude": -80.848351,
         "country_name": "United States",
         "country_code": "US",
         "admin1_name": "North Carolina",
-        "admin2_name": "Wilkes",
-        "display_name": "North Wilkesboro",
-        "full_display_name": "North Wilkesboro, NC, US"
+        "admin2_name": "Surry",
+        "display_name": "Elkin",
+        "full_display_name": "Elkin, NC, US"
     },
     "Time-Warp": {
         "woeid": 2487956,
@@ -22,14 +22,15 @@
         "full_display_name": "San Francisco, CA, US"
     },
     "coil": {
-        "woeid": 12587808,
-        "centroid_latitude": 26.145741,
-        "centroid_longitude": -80.477531,
+        "woeid": 2467000,
+        "centroid_latitude": 28.655661,
+        "centroid_longitude": -81.184357,
         "country_name": "United States",
         "country_code": "US",
         "admin1_name": "Florida",
-        "display_name": "Broward",
-        "full_display_name": "Broward, FL, US"
+        "admin2_name": "Seminole",
+        "display_name": "Oviedo",
+        "full_display_name": "Oviedo, FL, US"
     },
     "aqsd": {
         "woeid": 12761303,
@@ -118,6 +119,27 @@
         "full_display_name": "Prince Frederick, MD, US"
     },
     "polo": {
+        "woeid": 12765455,
+        "centroid_latitude": 40.141701,
+        "centroid_longitude": -74.856697,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Pennsylvania",
+        "admin2_name": "Bucks",
+        "display_name": "Levittown",
+        "full_display_name": "Levittown, PA, US"
+    },
+    "zyme": {
+        "woeid": 12798879,
+        "centroid_latitude": 47.311562,
+        "centroid_longitude": -122.216766,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Washington",
+        "display_name": "Auburn",
+        "full_display_name": "Auburn, WA, US"
+    },
+    "guest8388": {
         "woeid": 12765446,
         "centroid_latitude": 40.18116,
         "centroid_longitude": -74.909973,
@@ -128,14 +150,167 @@
         "display_name": "Langhorne",
         "full_display_name": "Langhorne, PA, US"
     },
-    "zyme": {
-        "woeid": 12799569,
-        "centroid_latitude": 46.076569,
-        "centroid_longitude": -119.089958,
+    "APic": {
+        "woeid": 676757,
+        "centroid_latitude": 48.13641,
+        "centroid_longitude": 11.57753,
+        "country_name": "Germany",
+        "country_code": "DE",
+        "admin1_name": "Bavaria",
+        "admin2_name": "Munich",
+        "display_name": "Munich",
+        "full_display_name": "Munich, BY, DE"
+    },
+    "kcone": {
+        "woeid": 12772005,
+        "centroid_latitude": 27.90814,
+        "centroid_longitude": -80.655708,
         "country_name": "United States",
         "country_code": "US",
-        "admin1_name": "Washington",
-        "display_name": "Kennewick",
-        "full_display_name": "Kennewick, WA, US"
+        "admin1_name": "Florida",
+        "admin2_name": "Brevard",
+        "display_name": "Palm Bay",
+        "full_display_name": "Palm Bay, FL, US"
+    },
+    "notzigggy": {
+        "woeid": 12760608,
+        "centroid_latitude": 40.821991,
+        "centroid_longitude": -73.988037,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "New Jersey",
+        "admin2_name": "Bergen",
+        "display_name": "Cliffside Park",
+        "full_display_name": "Cliffside Park, NJ, US"
+    },
+    "audio": {
+        "woeid": 2388929,
+        "centroid_latitude": 32.78183,
+        "centroid_longitude": -96.79586,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Texas",
+        "admin2_name": "Dallas",
+        "display_name": "Dallas",
+        "full_display_name": "Dallas, TX, US"
+    },
+    "knoseeum": {
+        "woeid": 12771997,
+        "centroid_latitude": 28.075211,
+        "centroid_longitude": -80.624123,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Florida",
+        "admin2_name": "Brevard",
+        "display_name": "Melbourne",
+        "full_display_name": "Melbourne, FL, US"
+    },
+    "mwsb": {
+        "woeid": 1100968,
+        "centroid_latitude": -35.284698,
+        "centroid_longitude": 149.152084,
+        "country_name": "Australia",
+        "country_code": "AU",
+        "admin1_name": "Australian Capital Territory",
+        "display_name": "Canberra",
+        "full_display_name": "Canberra, ACT, AU"
+    },
+    "mushroom": {
+        "woeid": 658421,
+        "centroid_latitude": 49.41349,
+        "centroid_longitude": 8.70819,
+        "country_name": "Germany",
+        "country_code": "DE",
+        "admin1_name": "Baden-Wurttemberg",
+        "admin2_name": "Stadtkreis Heidelberg",
+        "display_name": "Heidelberg",
+        "full_display_name": "Heidelberg, BW, DE"
+    },
+    "Trifton": {
+        "woeid": 2519706,
+        "centroid_latitude": 32.221539,
+        "centroid_longitude": -95.222,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Texas",
+        "admin2_name": "Smith",
+        "display_name": "Whitehouse",
+        "full_display_name": "Whitehouse, TX, US"
+    },
+    "naughtZigggy": {
+        "woeid": 12760608,
+        "centroid_latitude": 40.821991,
+        "centroid_longitude": -73.988037,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "New Jersey",
+        "admin2_name": "Bergen",
+        "display_name": "Cliffside Park",
+        "full_display_name": "Cliffside Park, NJ, US"
+    },
+    "dza": {
+        "woeid": 29374409,
+        "centroid_latitude": 47.1157,
+        "centroid_longitude": -67.476799,
+        "country_name": "Canada",
+        "country_code": "CA",
+        "admin1_name": "New Brunswick",
+        "admin2_name": "Victoria",
+        "display_name": "Denmark",
+        "full_display_name": "Denmark, NB, CA"
+    },
+    "cryptic": {
+        "woeid": 12778762,
+        "centroid_latitude": 42.688629,
+        "centroid_longitude": -83.387901,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Michigan",
+        "admin2_name": "Oakland",
+        "display_name": "Waterford",
+        "full_display_name": "Waterford, MI, US"
+    },
+    "mikey": {
+        "woeid": 2495739,
+        "centroid_latitude": 42.390789,
+        "centroid_longitude": -71.101196,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Massachusetts",
+        "admin2_name": "Middlesex",
+        "display_name": "Somerville",
+        "full_display_name": "Somerville, MA, US"
+    },
+    "cadmaus": {
+        "woeid": 781788,
+        "centroid_latitude": 46.949501,
+        "centroid_longitude": 7.4388,
+        "country_name": "Switzerland",
+        "country_code": "CH",
+        "admin1_name": "Canton of Berne",
+        "admin2_name": "Obersimmental-Saanen District",
+        "display_name": "Bern",
+        "full_display_name": "Bern, BE, CH"
+    },
+    "benjaminikuta": {
+        "woeid": 924943,
+        "centroid_latitude": 49.844662,
+        "centroid_longitude": 24.02808,
+        "country_name": "Ukraine",
+        "country_code": "UA",
+        "admin1_name": "Lviv Oblast",
+        "display_name": "L'viv",
+        "full_display_name": "L'viv, Lviv Oblast, UA"
+    },
+    "abbacis": {
+        "woeid": 2467000,
+        "centroid_latitude": 28.655661,
+        "centroid_longitude": -81.184357,
+        "country_name": "United States",
+        "country_code": "US",
+        "admin1_name": "Florida",
+        "admin2_name": "Seminole",
+        "display_name": "Oviedo",
+        "full_display_name": "Oviedo, FL, US"
     }
 }

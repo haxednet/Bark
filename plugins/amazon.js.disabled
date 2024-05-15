@@ -1,0 +1,48 @@
+const http = require('https');
+
+const mod = {
+    init: (e)=>{},
+	commands: [
+		{command: "amazon", hidden: false, enabled: true, usage: "$amazon query -- Searches amazon for products", callback: (e)=>{
+            if(e.args.length < 2) return e.reply("Not enough parameters");
+			
+			
+		const options = {
+			method: 'GET',
+			hostname: 'amazon23.p.rapidapi.com',
+			port: null,
+			path: '/product-search?query=' + encodeURIComponent(e._input) + '&country=US',
+			headers: {
+				'X-RapidAPI-Key': 'd8769620c1mshed81320f4eb2d9cp166ec2jsn844246e85ef3',
+				'X-RapidAPI-Host': 'amazon23.p.rapidapi.com'
+			}
+		};
+
+		const req = http.request(options, function (res) {
+			const chunks = [];
+
+			res.on('data', function (chunk) {
+				chunks.push(chunk);
+			});
+
+			res.on('end', function () {
+				const body = Buffer.concat(chunks);
+				const rr = JSON.parse(body.toString());
+				if(rr.errors && rr.errors.length > 0){
+					e.reply("Nothing was found on amazon for " + e._input);
+				}else{
+					e.reply(rr.result[0].title + " - $" +  rr.result[0].price.current_price +  " - " + rr.result[0].url);
+				}
+			});
+		});
+
+		req.end();
+			
+			
+			
+
+		}}
+	]
+}
+
+module.exports = mod;

@@ -18,9 +18,11 @@ const plugin = {
 					if(e.message.length > 5){
 						e.reply(bark[i].replace("%m", message));
 					}else{
-						e.reply(bark[i].replace("%m", ""));
+						if(e.chanConfig["Bark"])
+						e.reply(bark[i].replace("%m", e.chanConfig["Bark"]));
 					}
 				}
+				return true;
 			}
 			
 		}}

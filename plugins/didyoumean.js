@@ -14,11 +14,13 @@ const mod = {
 			ebits = e.message.split("/");
             if(ebits.length == 3) ebits = (e.message + "/").split("/");
             //if(last == e.message) return;
+			// s/test/lol/g
             last = e.message;
 			try{
                 ebits[1] = ebits[1].replace(/\-\-xywebc734md8/g, "\\/");
                 ebits[2] = ebits[2].replace(/\-\-xywebc734md8/g, "\\/");
                 ebits[3] = ebits[3].replace(/\-\-xywebc734md8/g, "\\/");
+				if(ebits[3] == " ") ebits[3] = "";
 				if(ebits.length > 3){
 					let re = new RegExp(ebits[1], ebits[3]);
 					let tc = cache.map(Array.apply.bind(Array, null));

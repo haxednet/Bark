@@ -22,31 +22,38 @@
                         e.bot.sendData("MODE " + e.channel + " -b " + e.args[2]);
                     }
                     break;
+					
+                case "quiet":
+					if(e.args.length > 3 && isNaN(e.args[3]) == false){
+
+					}else{
+						if(e.args.length < 3) return e.reply("Not enough arguments! " + prefix + "admin quiet user");
+						if(e.whoCache[e.args[2].toLowerCase()]){
+							let userHost = e.whoCache[e.args[2].toLowerCase()][1];
+							e.bot.sendData("MODE " + e.channel + " +q *!*@" + userHost.split("@")[1]);
+						}else{
+							e.bot.sendData("MODE " + e.channel + " +q " + e.args[2]);
+						}
+						break;
+					}
+					
                 case "timeout":
 					if(e.args.length < 4) return e.reply("Not enough arguments! " + prefix + "admin timeout user minutes");
                     if(e.whoCache[e.args[2].toLowerCase()]){
                         let userHost = e.whoCache[e.args[2].toLowerCase()][1];
                         e.bot.sendData("MODE " + e.channel + " +q *!*@" + userHost.split("@")[1]);
+						e.bot.sendData("MODE " + e.channel + " -v " + e.args[2]);
 						setTimeout(function(){
 							e.bot.sendData("MODE " + e.channel + " -q *!*@" + userHost.split("@")[1]);
 						},parseInt(e.args[3]) * 60000);
                     }else{
-                        e.bot.sendData("MODE " + e.channel + " +q " + e.args[2]);
+                        e.bot.sendData("MODE " + e.channel + " +q-v " + e.args[2] + " " + e.args[2]);
 						setTimeout(function(){
 							e.bot.sendData("MODE " + e.channel + " -q "  + e.args[2]);
 						},parseInt(e.args[3]) * 60000);
                     }
 					e.bot.sendData("PRIVMSG " + e.channel + " :"  + e.args[2] + ": Your messages have been muted for " + e.args[3] + " minute(s). Take this time to review your behaviour.");
 					break;
-                case "quiet":
-                    if(e.args.length < 3) return e.reply("Not enough arguments! " + prefix + "admin quiet user");
-                    if(e.whoCache[e.args[2].toLowerCase()]){
-                        let userHost = e.whoCache[e.args[2].toLowerCase()][1];
-                        e.bot.sendData("MODE " + e.channel + " +q *!*@" + userHost.split("@")[1]);
-                    }else{
-                        e.bot.sendData("MODE " + e.channel + " +q " + e.args[2]);
-                    }
-                    break;
                 
                 case "dequiet":
                 case "unquiet":
@@ -71,14 +78,22 @@
                     break;
                 
                 case "op":
-                    if(e.args.length < 3) return e.reply("Not enough arguments! " + prefix + "admin op user");
-                    e.bot.sendData("MODE " + e.channel + " +o " + e.args[2]);
+                    if(e.args.length < 2) return e.reply("Not enough arguments! " + prefix + "admin op user");
+					if(e.args.length == 2){
+						e.bot.sendData("MODE " + e.channel + " +o " + e.from.nick);
+					}else{
+						e.bot.sendData("MODE " + e.channel + " +o " + e.args[2]);
+					}
                     break;
                     
                 case "unop":
                 case "deop":
-                    if(e.args.length < 3) return e.reply("Not enough arguments! " + prefix + "admin deop user");
-                    e.bot.sendData("MODE " + e.channel + " -o " + e.args[2]);
+                    if(e.args.length < 2) return e.reply("Not enough arguments! " + prefix + "admin deop user");
+					if(e.args.length == 2){
+						e.bot.sendData("MODE " + e.channel + " -o " + e.from.nick);
+					}else{
+						e.bot.sendData("MODE " + e.channel + " -o " + e.args[2]);
+					}
                     break;
                     
                 case "voice":
@@ -98,6 +113,7 @@
                     break;
                     
             }
+			return true;
 		}}
 	]
 }

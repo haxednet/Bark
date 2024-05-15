@@ -58,14 +58,14 @@ const mod = {
 		}},
 		{command: "addbangedduck", enabled: true, hidden: true, usage: "Don't use this", callback: (e)=>{
             if(e.admin != true) return;
-            let kills = getKills("time-warp");
+            let kills = getKills("ferret");
             kills++;
             setKills("ferret", kills);
             return e.reply(">_>");
 		}},
 		{command: "removebangedduck", enabled: true, hidden: true, usage: "Don't use this", callback: (e)=>{
             if(e.admin != true) return;
-            let kills = getKills("time-warp");
+            let kills = getKills("ferret");
             kills--;
             setKills("ferret", kills);
             return e.reply("<_<");

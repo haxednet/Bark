@@ -21,8 +21,6 @@ const mod = {
     
 	onPrivmsg: (e)=>{
 		if(e.message.substr(1,7) == "voteban") e.reply("we don't do that vote stuff");
-        if(e.message.substr(0,2) == " .") e.reply("I don't put up with leading spaces, " + e.from.nick);
-        if(e.message.substr(0,3) == "  .") e.reply("I don't put up with leading spaces, " + e.from.nick);
 	}
 }
 

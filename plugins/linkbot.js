@@ -1,3 +1,5 @@
+let lastYT = "QGGvR2JBqMY";
+
 const plugin = {
     commands:[],
     onPrivmsg: (e)=>{
@@ -29,7 +31,6 @@ const plugin = {
                     bits[i] = bits[i].replace("view-source:","");
                     const yt = youtube(bits[i]);
                     if(yt){
-                        console.log(yt);
                         e.httpGet("https://www.googleapis.com/youtube/v3/videos?key=AIzaSyCrTbpjMiMM7Edsp-ewTu--d7dBkCDx_xE&part=snippet&id=" + yt, (a)=>{
                             try{
                                 let j = JSON.parse(a);

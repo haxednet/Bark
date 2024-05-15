@@ -266,16 +266,13 @@ class irc extends EventEmitter {
 		
 		function sendReply(channel, type, message, ms){
             message = message.toString();
-            console.log("sending " + message + " from reply function");
             channel = channel.replace(":","");
-			if(channel.substr(0,1)!="#") channel = parseUser(channel).nick;
+			if(channel.substr(0,1)!="#" && channel.substr(0,1)!="@" && channel.substr(0,1)!="+") channel = parseUser(channel).nick;
             
-            const replies = splitByNum(message, 450);
+            const replies = splitByNum(message, 1000);
 
-            for(let i in replies){
-                ms.sendData(type + " " + channel + " :" + replies[i]);
-                if(i > 10) return;
-            }
+			ms.sendData(type + " " + channel + " :" + message);
+
 		}
 		
 		function parseUser(e){
@@ -287,7 +284,8 @@ class irc extends EventEmitter {
 	
 	sendData(e){
 		log(e);
-        
+		if(e == undefined) return;
+		e = e.replace(/(EEEEEEEEEEEEEEEEE){1,9999}/g,"")
 		try{
             
             if(e.toLowerCase().indexOf("privmsg") > -1){
@@ -326,6 +324,8 @@ class irc extends EventEmitter {
 	isChannel(e){
 		const chanTypes = this.getISUPPORT("CHANTYPES")[1].split("");
 		
+		if(e.substr(0,1) == "@") return true;		
+		if(e.substr(0,1) == "+") return true;		
 		if(chanTypes.includes(e.substr(0,1))) return true;
 		
 		return false;

@@ -9,7 +9,7 @@ const mod = {
                     let nick = rlog[i][1].split("!")[0];
                     if(nick.toLowerCase() == e.args[1].toLowerCase()){
                         const nd = new Date(rlog[i][0]);
-                        return e.reply("[" + nd.toISOString() + "] " + "[" + rlog[i][2] + "] " + nick + ": " + rlog[i][3]);
+                        return e.reply("[" + nd.toGMTString() + "] " + "[" + rlog[i][2] + "] " + nick + ": " + rlog[i][3]);
                     }
                 }
                 return e.reply(e.args[1] + " was not found in the chat log :(");

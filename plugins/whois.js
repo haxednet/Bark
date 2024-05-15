@@ -43,6 +43,21 @@ const mod = {
                     return e.reply(replyStr);
                 }
             }
+		}},
+		{command: "botmaster", enabled: true, hidden: true, usage: "$botmaster <nick> -- Checks if given user is a botmaster", callback: (e)=>{
+            if(e.args.length < 2) return e.reply("ERROR: not enough parameters");
+            if(p.whoCache[e.args[1].toLowerCase()] == undefined){
+                return e.reply(e.args[1] + " wasn't found!");
+            }else{
+                const wu = p.whoCache[e.args[1].toLowerCase()];
+                let replyStr = "";
+
+				replyStr = e.args[1] + " is not a botmaster";
+				if(e.isAdmin(wu[1])) replyStr = e.args[1] + " is a botmaster";
+
+				return e.reply(replyStr);
+
+            }
 		}}
 	],
     

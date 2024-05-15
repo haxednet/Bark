@@ -1,22 +1,22 @@
 {
     "duckgoose": {
-        "karma": 14,
-        "plus": 20,
-        "minus": -6,
-        "+": 17,
-        "-": -6,
+        "karma": 54,
+        "plus": 63,
+        "minus": -9,
+        "+": 54,
+        "-": -7,
         "i": 1,
-        "t": 2
+        "t": 6
     },
     "zyme": {
-        "karma": 9,
-        "plus": 31,
-        "minus": -22,
-        "+": 25,
-        "-": -22,
-        "f": 1,
+        "karma": 33,
+        "plus": 56,
+        "minus": -23,
+        "+": 48,
+        "-": -23,
+        "f": 2,
         "i": 3,
-        "t": 2
+        "t": 3
     },
     "Nyaaori": {
         "karma": 1,
@@ -25,13 +25,15 @@
         "+": 1
     },
     "Time-Warp": {
-        "karma": 9,
-        "plus": 11,
-        "minus": -2,
-        "+": 4,
-        "t": 5,
-        "f": 1,
-        "-": -1
+        "karma": 52,
+        "plus": 59,
+        "minus": -7,
+        "+": 39,
+        "t": 10,
+        "f": 4,
+        "-": -4,
+        "i": 1,
+        "w": 2
     },
     "riff-IRC": {
         "karma": 2,
@@ -46,19 +48,21 @@
         "t": -1
     },
     "KindOne": {
-        "karma": 0,
-        "plus": 2,
+        "karma": 2,
+        "plus": 4,
         "minus": -2,
-        "+": 1,
+        "+": 3,
         "-": -1,
         "t": 0
     },
     "mwsb": {
-        "karma": 3,
-        "plus": 3,
-        "minus": 0,
-        "+": 2,
-        "t": 1
+        "karma": 86,
+        "plus": 93,
+        "minus": -7,
+        "+": 87,
+        "t": 3,
+        "-": -5,
+        "f": 1
     },
     "diogenese": {
         "karma": 1,
@@ -88,11 +92,11 @@
         "+": 1
     },
     "The_Tablet": {
-        "karma": -13,
-        "plus": 1,
+        "karma": -11,
+        "plus": 3,
         "minus": -14,
         "-": -14,
-        "+": 1
+        "+": 3
     },
     "frmus": {
         "karma": 1,
@@ -108,18 +112,19 @@
         "-": -1
     },
     "bark": {
-        "karma": 15,
-        "plus": 17,
-        "minus": -2,
-        "+": 16,
-        "-": -2,
+        "karma": 18,
+        "plus": 21,
+        "minus": -3,
+        "+": 20,
+        "-": -3,
         "i": 1
     },
     "DetectiveTaco": {
-        "karma": 2,
-        "plus": 2,
+        "karma": 6,
+        "plus": 6,
         "minus": 0,
-        "+": 2
+        "+": 4,
+        "t": 2
     },
     "jbwncster": {
         "karma": 1,
@@ -128,10 +133,10 @@
         "+": 1
     },
     "": {
-        "karma": 15,
+        "karma": 14,
         "plus": 22,
-        "minus": -7,
-        "w": 0,
+        "minus": -8,
+        "w": -1,
         "+": 14,
         "i": 1
     },
@@ -142,16 +147,16 @@
         "+": 1
     },
     "Roey": {
-        "karma": 1,
-        "plus": 1,
+        "karma": 22,
+        "plus": 22,
         "minus": 0,
-        "+": 1
+        "+": 22
     },
     "yukiup": {
-        "karma": 1,
-        "plus": 1,
+        "karma": 2,
+        "plus": 2,
         "minus": 0,
-        "+": 1
+        "+": 2
     },
     "ferret": {
         "karma": 5,
@@ -283,18 +288,20 @@
         "i": 1
     },
     "notZigggy": {
-        "karma": 12,
-        "plus": 13,
-        "minus": -1,
-        "+": 13,
-        "-": -1
+        "karma": 68,
+        "plus": 71,
+        "minus": -3,
+        "+": 62,
+        "-": -2,
+        "t": 5,
+        "i": 3
     },
     "aqsd": {
-        "karma": 16,
-        "plus": 16,
+        "karma": 63,
+        "plus": 63,
         "minus": 0,
-        "+": 14,
-        "f": 1,
+        "+": 59,
+        "f": 3,
         "t": 1
     },
     "bigfoot547": {
@@ -318,17 +325,20 @@
         "+": 1
     },
     "dave0": {
-        "karma": 2,
-        "plus": 2,
-        "minus": 0,
-        "+": 2
+        "karma": 56,
+        "plus": 57,
+        "minus": -1,
+        "+": 56,
+        "i": 1,
+        "-": -1
     },
     "Skalar": {
-        "karma": 3,
-        "plus": 3,
+        "karma": 28,
+        "plus": 28,
         "minus": 0,
-        "+": 2,
-        "f": 1
+        "+": 22,
+        "f": 4,
+        "i": 2
     },
     "kurahaupo": {
         "karma": 1,
@@ -337,16 +347,18 @@
         "+": 1
     },
     "chrysalis": {
-        "karma": 2,
-        "plus": 2,
+        "karma": 3,
+        "plus": 3,
         "minus": 0,
-        "+": 2
+        "+": 3
     },
     "coil": {
-        "karma": 6,
-        "plus": 6,
-        "minus": 0,
-        "+": 6
+        "karma": 104,
+        "plus": 107,
+        "minus": -3,
+        "+": 104,
+        "-": -3,
+        "t": 3
     },
     "Tintle": {
         "karma": 2,
@@ -363,10 +375,10 @@
         "i": 1
     },
     "Tewnah": {
-        "karma": 3,
-        "plus": 3,
+        "karma": 4,
+        "plus": 4,
         "minus": 0,
-        "+": 3
+        "+": 4
     },
     "twizzay": {
         "karma": 1,
@@ -375,10 +387,10 @@
         "+": 1
     },
     "Buliwyf": {
-        "karma": 1,
-        "plus": 1,
+        "karma": 4,
+        "plus": 4,
         "minus": 0,
-        "+": 1
+        "+": 4
     },
     "portalrat": {
         "karma": 2,
@@ -398,5 +410,431 @@
         "plus": 1,
         "minus": 0,
         "t": 1
+    },
+    "noceb0": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "porchtuna": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "dza": {
+        "karma": 29,
+        "plus": 31,
+        "minus": -2,
+        "+": 29,
+        "-": -1,
+        "t": 1
+    },
+    "audio": {
+        "karma": 1,
+        "plus": 2,
+        "minus": -1,
+        "-": -1,
+        "+": 2
+    },
+    "money": {
+        "karma": 3,
+        "plus": 3,
+        "minus": 0,
+        "+": 3
+    },
+    "hsmir": {
+        "karma": 3,
+        "plus": 3,
+        "minus": 0,
+        "+": 3
+    },
+    "kcrow": {
+        "karma": 1,
+        "plus": 2,
+        "minus": -1,
+        "f": 1,
+        "-": -1,
+        "+": 1
+    },
+    "oldfashionedcow": {
+        "karma": 1,
+        "plus": 3,
+        "minus": -2,
+        "t": 0,
+        "+": 1
+    },
+    "Money": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "darth_tux": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "Panther": {
+        "karma": 7,
+        "plus": 7,
+        "minus": 0,
+        "+": 7
+    },
+    "[itchyjunk]": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "aloo_shu": {
+        "karma": 5,
+        "plus": 6,
+        "minus": -1,
+        "+": 5,
+        "i": 1,
+        "-": -1
+    },
+    "nvz": {
+        "karma": 9,
+        "plus": 11,
+        "minus": -2,
+        "+": 10,
+        "-": -2,
+        "f": 1
+    },
+    "paige": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "zymed": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "pinkieval": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "dTal": {
+        "karma": 1,
+        "plus": 2,
+        "minus": -1,
+        "+": 2,
+        "-": -1
+    },
+    "Ellenor": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "fChanX": {
+        "karma": 5,
+        "plus": 5,
+        "minus": 0,
+        "+": 5
+    },
+    "qed": {
+        "karma": 0,
+        "plus": 1,
+        "minus": -1,
+        "-": -1,
+        "+": 1
+    },
+    "thiccdaddy": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "KE0VVT": {
+        "karma": 3,
+        "plus": 3,
+        "minus": 0,
+        "+": 3
+    },
+    "squiggle_": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "krustacean": {
+        "karma": 4,
+        "plus": 4,
+        "minus": 0,
+        "+": 4
+    },
+    "aspirin": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "tallgal": {
+        "karma": 3,
+        "plus": 3,
+        "minus": 0,
+        "f": 1,
+        "+": 2
+    },
+    "Orbbit": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "v9fk1yn3nu": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "i": 1
+    },
+    "burge": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "nekos": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "semsogg": {
+        "karma": 9,
+        "plus": 9,
+        "minus": 0,
+        "t": 1,
+        "+": 8
+    },
+    "grumbler": {
+        "karma": 3,
+        "plus": 3,
+        "minus": 0,
+        "+": 3
+    },
+    "winny": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "blueagain": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "sn0wflake": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "benjaminikuta": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 1,
+        "f": 1
+    },
+    "squiggle": {
+        "karma": 4,
+        "plus": 4,
+        "minus": 0,
+        "+": 4
+    },
+    "db": {
+        "karma": 6,
+        "plus": 6,
+        "minus": 0,
+        "+": 4,
+        "f": 2
+    },
+    "immibis": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "gog": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "mikey": {
+        "karma": 8,
+        "plus": 8,
+        "minus": 0,
+        "+": 8
+    },
+    "Salty_Tuna": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "Tuna": {
+        "karma": 10,
+        "plus": 14,
+        "minus": -4,
+        "+": 11,
+        "-": -4,
+        "f": 1,
+        "t": 1,
+        "i": 1
+    },
+    "dangersone": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "Didact": {
+        "karma": 13,
+        "plus": 14,
+        "minus": -1,
+        "+": 2,
+        "t": 10,
+        "i": 1
+    },
+    "cornduck": {
+        "karma": 3,
+        "plus": 3,
+        "minus": 0,
+        "+": 3
+    },
+    "Nick01": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "thunor": {
+        "karma": 3,
+        "plus": 3,
+        "minus": 0,
+        "+": 3
+    },
+    "squiggle21": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "VanUnamed": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "Ashstar": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "kcrab": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "DunceCotus": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "kusanagi": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "nshire": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "iovoid": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "death916": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "erry": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "FireBeard": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "abbacis": {
+        "karma": -2,
+        "plus": 1,
+        "minus": -3,
+        "-": -3,
+        "+": 1
+    },
+    "adnauseam": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "tilikum": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "ThePendulum": {
+        "karma": 2,
+        "plus": 2,
+        "minus": 0,
+        "+": 2
+    },
+    "Cashlin": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "jakebreaksit": {
+        "karma": 1,
+        "plus": 1,
+        "minus": 0,
+        "+": 1
+    },
+    "snahc": {
+        "karma": -2,
+        "plus": 0,
+        "minus": -2,
+        "-": -1,
+        "t": -1
     }
 }

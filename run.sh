@@ -1,1 +1,2 @@
-while sleep 10 ; do node index ; done
+
+node index ; while sleep 600 ; do node index ; done

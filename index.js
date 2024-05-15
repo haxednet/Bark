@@ -9,7 +9,7 @@ process.on('uncaughtException', function (err) {
 const PERMISSION_ERROR = "Elevated privileges required for command $com";
 const NOT_ENOUGH_ARGS = "Not enough arguments for command $com";
 const INVALID_ARGUMENTS = "Invalid arguments";
-const ABOUT_BARK = "Bark 3.0 is a nodejs powered modular IRCv3 bot created by Matthew Ryan. https://github.com/haxednet/Bark";
+const ABOUT_BARK = "Bark 3.0 is a nodejs powered modular IRCv3 bot created by duckgoose. https://github.com/haxednet/Bark";
 /* ************* */
 
 
@@ -23,11 +23,11 @@ const irc = require('./irc.js');
 const homoglyph = require('./homoglyph.js');
 const config = require('./config.json');
 const keys = require('./apiKeys.json');
+const chatLog = require('./log.json');
 
 const plugins = {};
 const whoCache = {};
 const whoList = [];
-const chatLog = [];
 const banHammer = [];
 
 
@@ -80,7 +80,18 @@ bot.on('data', (e) => {
     switch(args[1]){
         
 		case "MODE":
+			const chanConfig = config.channels[args[2].replace(/^(\@|\+)/,"")];
+			if(e.toLowerCase().indexOf("+o time-warp") > 1 && chanConfig && chanConfig.deopTimewarp){
+				bot.sendData("MODE ##defocus -o time-warp");
+			}
+			if(e.toLowerCase().indexOf("-o bark") > 1 && e.toLowerCase().indexOf("##defocus") > 1){
+				clearTimeout(opTimer);
+				opTimer = setTimeout(function(){
+					bot.sendData("PRIVMSG ChanServ :op ##defocus bark");
+					bot.sendData("PRIVMSG ##defocus :Don't do that.");					
+				},2000);
 
+			}
 			break;
 		
         case "ACCOUNT":
@@ -111,8 +122,14 @@ bot.on('data', (e) => {
 
 bot.on('join', (e) => {
     
-    const chanConfig = config.channels[e.channel.toLowerCase()];
+    let chanConfig = config.channels[e.channel.toLowerCase().replace(/^(\@|\+)/,"")];
     
+	if(chanConfig == undefined){
+		config.channels[e.channel.toLowerCase().replace(/^(\@|\+)/,"")] = config.channels["-new-"];
+		chanConfig = config.channels["-new-"];
+	}
+	
+	
     if(config.bot.nick.toLowerCase() == e.user.nick.toLowerCase()){
         /* We've joined a new channel */
         if(chanConfig.opOnJoin) bot.sendPrivmsg("chanserv", "op " + e.channel.toLowerCase());
@@ -149,7 +166,7 @@ bot.on('join', (e) => {
 
 bot.on('kick', (e) => {
     if(e.kicked.toLowerCase() == config.bot.nick.toLowerCase()){
-        const chanConfig = config.channels[e.channel.toLowerCase()];
+        const chanConfig = config.channels[e.channel.toLowerCase().replace(/^(\@|\+)/,"")];
         if(chanConfig && chanConfig["autoRejoin"]){
             bot.sendData("JOIN " + e.channel);
             setTimeout(function(){
@@ -167,7 +184,7 @@ bot.on('numeric', (e) => {
         console.log("Logged in to IRC, joining channels...");
         setTimeout(()=>{
             for(let i in config.channels){
-                bot.sendData("JOIN " + (i + " " + (config.channels[i].key || "")));
+                bot.sendData("JOIN " + (i + " " + (config.channels[i.replace(/^(\@|\+)/,"")].key || "")));
                 whoList.push(i);
                 //bot.sendData("WHO " + i + " %uhna");
             }
@@ -176,7 +193,17 @@ bot.on('numeric', (e) => {
         }, 3000);
         
     }
-    
+    if(e.number == "999"){
+			bot.sendData("NICK Bark34857389");
+			setTimeout(function(){
+				bot.sendData("PRIVMSG nickserv :ghost bark");
+			},2000);
+			setTimeout(function(){
+				bot.sendData("nick Bark");
+			},4000);
+			
+		 
+	}
     if(e.number == "353"){
         const nicks = e.data.substr(e.data.indexOf(" :") + 2).split(" ");
         for(let i in nicks){
@@ -214,7 +241,7 @@ bot.on('quit', (e) => {
 
 bot.on('part', (e) => {
     if(e.user.nick.toLowerCase() == config.bot.nick.toLowerCase()){
-        const chanConfig = config.channels[e.channel.toLowerCase()];
+        const chanConfig = config.channels[e.channel.toLowerCase().replace(/^(\@|\+)/,"")];
         if(chanConfig && chanConfig["autoRejoin"]){
             bot.sendData("JOIN " + e.channel);
             setTimeout(function(){
@@ -245,8 +272,8 @@ bot.on('privmsg', (e) => {
     /* allow commands in PMs */
     if(e.to.substr(0,1) != "#"){
         if(e.message.substr(0,1) == "#"){
-            if(config.channels[e.message.split(" ")[0]] != undefined){
-                if(config.channels[e.message.split(" ")[0]].allowCommandsInPM){
+            if(config.channels[e.message.split(" ")[0].replace(/^(\@|\+)/,"")] != undefined){
+                if(config.channels[e.message.split(" ")[0].replace(/^(\@|\+)/,"")].allowCommandsInPM && e.message.toLowerCase().indexOf(".tell") < 1){
                     e.to = e.message.split(" ")[0];
                     e.message = e.message.substr(e.message.indexOf(" ") + 1);
                 }else{
@@ -261,13 +288,14 @@ bot.on('privmsg', (e) => {
     if(e.isPM == false){
         /* chatLog is a small log of chat messages for diagnostic usage */
         chatLog.push([Date.now(), e.from.mask, e.to, e.message]);
-        if(chatLog.length > 10240) chatLog.splice(0,1);
+        if(chatLog.length > 10000) chatLog.splice(0,1);
+		
     }
     
     const input = e.message.substr(1).replace(/\s\s/g, " ").trim();
     const _input = e.message.substr(e.message.indexOf(" ") + 1);
     const args = input.split(" ");
-    const chanConfig = config.channels[e.to.toLowerCase()];
+    const chanConfig = config.channels[e.to.toLowerCase().replace(/^(\@|\+)/,"")];
     
     /* some things need to be added to e. this gives plugins added functionality by passing e to them. */
     e.command = args[0].toLowerCase();
@@ -277,11 +305,10 @@ bot.on('privmsg', (e) => {
     e.admin = isAdmin(e.from.mask,e.to.toLowerCase());
     e.isAdmin = isAdmin;
     e.botMaster = isAdmin(e.from.mask);
-    e.channel = e.to.toLowerCase();
     e.dataStore = dataStore;
     e.whoCache = whoCache;
     e.bot = bot;
-    e.channel = e.to;
+    e.channel = e.to.replace(/^(\@|\+)/,"");
     e.chanConfig = chanConfig;
     e.config = config;
     e.kick = kick;
@@ -292,6 +319,8 @@ bot.on('privmsg', (e) => {
     e.voice = voice;
     e.username = (whoCache[e.from.nick.toLowerCase()] && whoCache[e.from.nick.toLowerCase()][2]) ? whoCache[e.from.nick.toLowerCase()][0] : e.from.nick;
     
+	console.log(e.channel);
+	
     if(e.botMaster == true) e.admin = true;
     
     if(chanConfig == undefined) return;
@@ -302,12 +331,23 @@ bot.on('privmsg', (e) => {
         if(homoglyph.stringify(e.message.toLowerCase()).indexOf(chanConfig.bannedParams[i].toLowerCase()) > -1 && !e.admin) return;
     }
     /* check for ban words and kick words if they're not admin */
+	let regexArgs = "ig";
+	let regexStr = "nothing";
     if(chanConfig && !e.admin){
         for(let i in chanConfig.kickWords){
             if(chanConfig.kickWords[i].substr(0,1) == "/"){
-                let re = new RegExp(chanConfig.kickWords[i].slice(1,-1), "ig");
+				regexArgs = chanConfig.kickWords[i].substr(1).substr(chanConfig.kickWords[i].lastIndexOf("/"));
+				regexStr = chanConfig.kickWords[i].substr(1).substr(0,chanConfig.kickWords[i].lastIndexOf("/")-1);
+                
+				
+				
+				let re = new RegExp(regexStr, regexArgs);
+				console.log(e.message.match(re));
+				console.log(regexStr);
+				console.log(regexArgs);
                 if(e.message.match(re) != null) kick(e.to, e.from.nick, "Please mind the language");
             }else{
+				console.log(chanConfig.kickWords[i]);
                 if(e.message.toLowerCase().indexOf(chanConfig.kickWords[i].toLowerCase()) > -1){
                     kick(e.to, e.from.nick, "Please mind the language");
                 }
@@ -315,7 +355,9 @@ bot.on('privmsg', (e) => {
         }
         for(let i in chanConfig.banWords){
             if(chanConfig.banWords[i].substr(0,1) == "/"){
-                let re = new RegExp(chanConfig.banWords[i].slice(1,-1), "ig");
+				regexArgs = chanConfig.kickWords[i].substr(1).substr(chanConfig.kickWords[i].lastIndexOf("/"));
+				regexStr = chanConfig.kickWords[i].substr(1).substr(0,chanConfig.kickWords[i].lastIndexOf("/")-1);
+                let re = new RegExp(regexStr, regexArgs);
                 if(e.message.match(re) != null) kickBan(e.to, e.from.nick, "Please mind the language");
             }else{
                 if(e.message.toLowerCase().indexOf(chanConfig.banWords[i].toLowerCase()) > -1){
@@ -334,7 +376,7 @@ bot.on('privmsg', (e) => {
     /* Below is the main functionality for commands */
     if(e.message.substr(0,1) == config.globalSettings.commandPrefix){
         
-		//fs.appendFileSync("ccom.log", Date.now() + " " + e.to + " " + e.from.mask + ": " + e.message + "\r\n");
+		fs.appendFileSync("ccom.log", Date.now() + " " + e.to + " " + e.from.mask + ": " + e.message + "\r\n");
 		
         switch(e.command){
             
@@ -524,9 +566,9 @@ function isAdmin(mask, channel){
             if( mask.match(userAsRegex(config.globalSettings.botMasters[i])) != null ) return true;
         }
     }else{
-        if( config.channels[channel] == undefined ) return false;
-        for(let i in config.channels[channel].admins){
-            if( mask.match(userAsRegex(config.channels[channel].admins[i])) != null ) return true;
+        if( config.channels[channel.replace(/^(\@|\+)/,"")] == undefined ) return false;
+        for(let i in config.channels[channel.replace(/^(\@|\+)/,"")].admins){
+            if( mask.match(userAsRegex(config.channels[channel.replace(/^(\@|\+)/,"")].admins[i])) != null ) return true;
         }
     }
     return false;
@@ -634,9 +676,5 @@ setInterval(()=>{
     }
     bot.sendData("WHO " + whoList[0] + " %uhna");
     whoList.splice(0,1);
+	fs.writeFileSync("./log.json", JSON.stringify(chatLog));
 },3.6e+6);
-
-setInterval(()=>{
-    //console.log(Object.keys(whoCache).length);
-},60000);
-

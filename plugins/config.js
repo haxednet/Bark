@@ -19,9 +19,16 @@ const plugin = {
                     
                 case "set":
                     if(e.args.length < 4) return e.reply("Set channel config's item value. " + prefix + "config set item \"value\"");
-
-                        e.chanConfig[e.args[2]] = JSON.parse(str);
-                        return e.reply("operation completed successfully");
+						try{
+							if(str == "null"){
+								delete(e.chanConfig[e.args[2]]);
+							}else{
+								e.chanConfig[e.args[2]] = JSON.parse(str);
+							}
+							return e.reply("operation completed successfully");
+						}catch(error){
+							return e.reply(error.message);
+						}
                     break;
                     
                 case "push":
