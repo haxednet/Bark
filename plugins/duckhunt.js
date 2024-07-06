@@ -110,7 +110,7 @@ function addChannelSettings(e){
 function bef(e){
     if(channelSettings[e.to.toLowerCase()] && channelSettings[e.to.toLowerCase()].active){
         if(rand(1,4) == 1){
-            return e.reply(e.from.nick + ": You tried befriending a duck, but it refused :( Maybe try again");
+            return e.reply(e.from.nick + ": Well this is awkward, the duck needs to think about it. You can try again.");
         }else{
             let friends = getFriends(e.username);
             friends++;
